@@ -37,7 +37,41 @@ create index if not exists attendance_program_idx
 alter table public.programs enable row level security;
 alter table public.attendance enable row level security;
 
-revoke all on public.programs from anon, authenticated;
-revoke all on public.attendance from anon, authenticated;
-grant all on public.programs to service_role;
-grant all on public.attendance to service_role;
+grant usage on schema public to anon, authenticated, service_role;
+grant select, insert, update on table public.programs to anon, authenticated;
+grant select, insert on table public.attendance to anon, authenticated;
+grant all on table public.programs to service_role;
+grant all on table public.attendance to service_role;
+
+drop policy if exists programs_read on public.programs;
+create policy programs_read on public.programs
+  for select to anon, authenticated
+  using (true);
+
+drop policy if exists programs_insert on public.programs;
+create policy programs_insert on public.programs
+  for insert to anon, authenticated
+  with check (true);
+
+drop policy if exists programs_update on public.programs;
+create policy programs_update on public.programs
+  for update to anon, authenticated
+  using (true)
+  with check (true);
+
+drop policy if exists attendance_read on public.attendance;
+create policy attendance_read on public.attendance
+  for select to anon, authenticated
+  using (true);
+
+drop policy if exists attendance_insert on public.attendance;
+create policy attendance_insert on public.attendance
+  for insert to anon, authenticated
+  with check (
+    exists (
+      select 1
+      from public.programs
+      where programs.id = attendance.program_id
+        and programs.is_open
+    )
+  );

@@ -22,6 +22,13 @@ Tanpa pembolehubah Supabase, rekod ditulis ke `data/store.json` pada mesin pemba
 
 PIN panel penganjur dalam pembangunan, jika `ORGANIZER_PIN` belum ditetapkan: `hadir-2026`.
 
+## Projek yang disambungkan
+
+- GitHub: https://github.com/MrSuhailiSulaiman/certigen
+- Supabase: https://dhgevqfinjoyxlfotkec.supabase.co
+
+Kunci anon disimpan dalam `.env.local` pada pelayan pembangunan, bukan dalam git. Selepas kunci itu dibaca, aplikasi bercakap dengan projek Supabase ini. Jadual `programs` dan `attendance` perlu diwujudkan sekali dengan fail migrasi di bawah, kerana kunci anon tidak boleh mencipta jadual.
+
 ## Sambung Supabase, GitHub, dan Vercel
 
 1. Cipta repositori GitHub untuk projek ini, kemudian sambungkan cawangan yang mengandungi kod.
@@ -33,13 +40,14 @@ vercel integration add supabase
 vercel env pull .env.local --yes
 ```
 
-4. Dalam Supabase SQL Editor, jalankan `supabase/migrations/20261008120000_init.sql`. Skrip ini mencipta jadual `programs` dan `attendance`, serta menutup akses terus daripada kunci anon.
+4. Dalam Supabase SQL Editor, jalankan `supabase/migrations/20261008120000_init.sql`. Skrip ini mencipta jadual `programs` dan `attendance`, kemudian membenarkan kunci anon membaca program, menulis kehadiran, dan mengurus program.
 5. Pastikan pembolehubah berikut wujud pada Vercel untuk Production, Preview, dan Development:
 
 | Nama | Kegunaan |
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` atau `SUPABASE_URL` | URL projek Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` atau `SUPABASE_SECRET_KEY` | Kunci pelayan untuk menulis rekod. Jangan dedahkan pada pelayar. |
+| `SUPABASE_ANON_KEY` atau `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Kunci anon. Cukup untuk borang kehadiran selepas migrasi SQL dijalankan. |
+| `SUPABASE_SERVICE_ROLE_KEY` atau `SUPABASE_SECRET_KEY` | Pilihan. Kunci pelayan yang memintas RLS. |
 | `ORGANIZER_PIN` | PIN panel `/urus`. Minimum 4 aksara. |
 
 6. Deploy semula selepas pembolehubah dan jadual sedia. Banner di atas halaman bertukar kepada “disimpan di Supabase” apabila sambungan berjaya.
