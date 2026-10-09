@@ -61,10 +61,14 @@ export function RegisterProgramForm({
           role="status"
         >
           <p className="font-medium">Program telah disimpan.</p>
-          <dl className="grid gap-2 text-sm sm:grid-cols-3">
+          <dl className="grid gap-2 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-muted-foreground">Nama Program</dt>
               <dd>{saved.title}</dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground">Lokasi</dt>
+              <dd>{saved.venue}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Tarikh Program</dt>
@@ -99,6 +103,20 @@ export function RegisterProgramForm({
             autoComplete="off"
             aria-invalid={Boolean(errors.title)}
             aria-describedby={errors.title ? "title-error" : undefined}
+            className="h-11"
+          />
+        </Field>
+        <Field id="venue" label="Lokasi" error={errors.venue}>
+          <Input
+            id="venue"
+            name="venue"
+            required
+            minLength={2}
+            maxLength={160}
+            autoComplete="off"
+            placeholder="Dewan atau alamat program"
+            aria-invalid={Boolean(errors.venue)}
+            aria-describedby={errors.venue ? "venue-error" : undefined}
             className="h-11"
           />
         </Field>

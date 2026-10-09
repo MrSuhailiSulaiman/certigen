@@ -68,7 +68,7 @@ async function ProgramBody({ params }: { params: Promise<{ slug: string }> }) {
           ) : null}
           {program.venue ? (
             <div>
-              <dt className="text-muted-foreground">Tempat</dt>
+              <dt className="text-muted-foreground">Lokasi</dt>
               <dd>{program.venue}</dd>
             </div>
           ) : null}

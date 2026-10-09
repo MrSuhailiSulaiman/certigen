@@ -98,6 +98,11 @@ export const programRegistrationSchema = z.object({
     .trim()
     .min(3, "Nama program diperlukan.")
     .max(160, "Nama program terlalu panjang."),
+  venue: z
+    .string()
+    .trim()
+    .min(2, "Lokasi diperlukan.")
+    .max(160, "Lokasi terlalu panjang."),
   eventDate: dateField,
   eventTime: timeField,
 })
@@ -143,6 +148,7 @@ export function readProgram(formData: FormData) {
 export function readProgramRegistration(formData: FormData) {
   return programRegistrationSchema.safeParse({
     title: formData.get("title") ?? "",
+    venue: formData.get("venue") ?? "",
     eventDate: formData.get("eventDate") ?? "",
     eventTime: formData.get("eventTime") ?? "",
   })

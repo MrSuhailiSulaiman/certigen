@@ -45,7 +45,7 @@ export function ProgramCard({
         ) : null}
         {program.venue ? (
           <p>
-            <span className="text-muted-foreground">Tempat </span>
+            <span className="text-muted-foreground">Lokasi </span>
             {program.venue}
           </p>
         ) : null}

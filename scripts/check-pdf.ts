@@ -57,6 +57,7 @@ assert.equal(invalid.success, false)
 
 const registered = programRegistrationSchema.safeParse({
   title: "Bengkel Contoh",
+  venue: "Dewan Seminar, Putrajaya",
   eventDate: "2026-10-18",
   eventTime: "09:30:00",
 })

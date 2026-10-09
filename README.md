@@ -4,7 +4,7 @@ Aplikasi web untuk merekod kehadiran program dan menjana sijil penyertaan PDF be
 
 ## Aliran
 
-1. Buka `/daftar` dan isi nama program, tarikh, serta masa. Rekod disimpan di Supabase.
+1. Buka `/daftar` dan isi nama program, lokasi, tarikh, serta masa. Rekod disimpan di Supabase.
 2. Penganjur boleh masuk ke panel `/urus` untuk menambah tempat, penganjur, dan penandatangan.
 3. Peserta buka program, isi nama penuh dan no. kad pengenalan.
 4. Sistem simpan kehadiran di Supabase, kemudian peserta muat turun sijil PDF A4.

@@ -35,8 +35,8 @@ export default function RegisterProgramPage() {
         </p>
         <h1 className="mt-3 font-heading text-4xl leading-tight">Daftar program</h1>
         <p className="mt-3 text-lg leading-8 text-muted-foreground">
-          Isi nama program, tarikh, dan masa. Rekod disimpan di Supabase dan
-          terus muncul pada senarai program.
+          Isi nama program, lokasi, tarikh, dan masa. Rekod disimpan di Supabase
+          dan terus muncul pada senarai program.
         </p>
       </section>
 
@@ -44,7 +44,7 @@ export default function RegisterProgramPage() {
         <CardHeader>
           <h2 className="font-heading text-2xl">Maklumat program</h2>
           <CardDescription>
-            Ketiga-tiga medan wajib diisi sebelum rekod disimpan.
+            Keempat-empat medan wajib diisi sebelum rekod disimpan.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -99,6 +99,7 @@ async function SavedPrograms() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nama Program</TableHead>
+                  <TableHead>Lokasi</TableHead>
                   <TableHead>Tarikh Program</TableHead>
                   <TableHead>Masa</TableHead>
                 </TableRow>
@@ -111,6 +112,7 @@ async function SavedPrograms() {
                         {program.title}
                       </Link>
                     </TableCell>
+                    <TableCell>{program.venue || "—"}</TableCell>
                     <TableCell>{formatDate(program.eventDate)}</TableCell>
                     <TableCell>{formatTime(program.eventTime) || "—"}</TableCell>
                   </TableRow>

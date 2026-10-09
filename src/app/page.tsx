@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils"
 const steps = [
   {
     title: "Cipta program",
-    body: "Isi nama program, tarikh, dan masa pada borang daftar.",
+    body: "Isi nama program, lokasi, tarikh, dan masa pada borang daftar.",
   },
   {
     title: "Isi kehadiran",

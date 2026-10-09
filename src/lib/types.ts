@@ -45,6 +45,7 @@ export type SavedProgram = {
   id: string
   slug: string
   title: string
+  venue: string
   eventDate: string
   eventTime: string
 }

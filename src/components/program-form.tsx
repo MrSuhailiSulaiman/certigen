@@ -78,7 +78,7 @@ export function ProgramForm({
             className="h-11"
           />
         </Field>
-        <Field id="venue" label="Tempat" error={errors.venue}>
+        <Field id="venue" label="Lokasi" error={errors.venue}>
           <Input id="venue" name="venue" required defaultValue={program?.venue} className="h-11" />
         </Field>
         <Field id="eventDate" label="Tarikh mula" error={errors.eventDate}>
