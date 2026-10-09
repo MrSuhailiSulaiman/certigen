@@ -5,6 +5,7 @@ import { Suspense } from "react"
 
 import { toggleProgram, updateProgram } from "@/app/actions"
 import { ProgramForm } from "@/components/program-form"
+import { ProgramShare } from "@/components/program-share"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,8 +23,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { buttonVariants } from "@/components/ui/button"
-import { isOrganizer } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { formatDateTime, formatIdentity } from "@/lib/format"
+import { attendanceUrl, requestOrigin } from "@/lib/request-origin"
 import { getStore } from "@/lib/store"
 import { cn } from "@/lib/utils"
 
@@ -50,12 +52,13 @@ async function OrganizerProgramBody({
   params: Promise<{ id: string }>
 }) {
   await connection()
-  if (!(await isOrganizer())) redirect("/urus")
+  if (!(await getSession())) redirect("/login?next=/urus")
   const { id } = await params
   const store = getStore()
-  const [program, attendance] = await Promise.all([
+  const [program, attendance, origin] = await Promise.all([
     store.getProgramById(id),
     store.listAttendance(id),
+    requestOrigin(),
   ])
   if (!program) notFound()
   const update = updateProgram.bind(null, program.id)
@@ -64,7 +67,7 @@ async function OrganizerProgramBody({
     <div className="mx-auto grid w-full max-w-5xl gap-8 px-4 py-10 sm:px-6">
       <div>
         <Link href="/urus" className="text-sm text-muted-foreground hover:text-foreground">
-          Panel penganjur
+          Panel urus
         </Link>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Badge variant={program.isOpen ? "default" : "secondary"}>
@@ -97,6 +100,18 @@ async function OrganizerProgramBody({
           </form>
         </div>
       </div>
+
+      <Card id="kongsi">
+        <CardHeader>
+          <h2 className="font-heading text-2xl">Kongsi borang kehadiran</h2>
+          <CardDescription>
+            Imbas kod QR atau salin pautan. Peserta mengisi borang tanpa log masuk.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ProgramShare url={attendanceUrl(origin, program.slug)} title={program.title} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

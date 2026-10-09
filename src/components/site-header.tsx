@@ -1,9 +1,27 @@
 import Link from "next/link"
+import { connection } from "next/server"
 
-import { buttonVariants } from "@/components/ui/button"
+import { logout } from "@/app/actions"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { getSession } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 
-export function SiteHeader() {
+export function SiteHeaderFallback() {
+  return (
+    <header className="border-b border-border bg-card">
+      <div className="h-1 bg-primary" />
+      <div className="h-0.5 bg-brand" />
+      <div className="mx-auto flex h-[68px] w-full max-w-5xl items-center px-4 sm:px-6">
+        <span className="font-heading text-lg">SijilHadir</span>
+      </div>
+    </header>
+  )
+}
+
+export async function SiteHeader() {
+  await connection()
+  const session = await getSession()
+
   return (
     <header className="border-b border-border bg-card">
       <div className="h-1 bg-primary" />
@@ -28,18 +46,41 @@ export function SiteHeader() {
           >
             Program
           </Link>
-          <Link
-            href="/daftar"
-            className={cn(buttonVariants({ size: "lg" }), "h-10 px-3")}
-          >
-            Daftar
-          </Link>
-          <Link
-            href="/urus"
-            className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10 px-3")}
-          >
-            Urus
-          </Link>
+          {session ? (
+            <Link
+              href="/daftar"
+              className={cn(buttonVariants({ size: "lg" }), "h-10 px-3")}
+            >
+              Daftar
+            </Link>
+          ) : null}
+          {session ? (
+            <Link
+              href="/urus"
+              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10 px-3")}
+            >
+              Urus
+            </Link>
+          ) : null}
+          {session?.role === "admin" ? (
+            <Link
+              href="/urus/guru"
+              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10 px-3")}
+            >
+              Guru
+            </Link>
+          ) : null}
+          {session ? (
+            <form action={logout}>
+              <Button type="submit" variant="ghost" className="h-10 px-3">
+                Keluar
+              </Button>
+            </form>
+          ) : (
+            <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "h-10 px-3")}>
+              Masuk
+            </Link>
+          )}
         </nav>
       </div>
     </header>

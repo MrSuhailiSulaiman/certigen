@@ -1,8 +1,10 @@
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { connection } from "next/server"
 import { Suspense } from "react"
 
 import { registerProgram } from "@/app/actions"
+import { ProgramShare } from "@/components/program-share"
 import { RegisterProgramForm } from "@/components/register-program-form"
 import {
   Card,
@@ -18,7 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { getSession } from "@/lib/auth"
 import { formatDate, formatTime } from "@/lib/format"
+import { attendanceUrl, requestOrigin } from "@/lib/request-origin"
 import { getStore } from "@/lib/store"
 import type { Program } from "@/lib/types"
 
@@ -28,6 +32,19 @@ export const metadata = {
 
 export default function RegisterProgramPage() {
   return (
+    <Suspense fallback={<div className="mx-auto max-w-3xl px-4 py-10">Memuatkan borang...</div>}>
+      <RegisterProgramBody />
+    </Suspense>
+  )
+}
+
+async function RegisterProgramBody() {
+  await connection()
+  const session = await getSession()
+  if (!session) redirect("/login?next=/daftar")
+  const origin = await requestOrigin()
+
+  return (
     <div className="mx-auto grid w-full max-w-3xl gap-8 px-4 py-10 sm:px-6">
       <section>
         <p className="flex items-center gap-2 text-sm font-semibold tracking-[0.14em] text-primary uppercase">
@@ -36,8 +53,8 @@ export default function RegisterProgramPage() {
         </p>
         <h1 className="mt-3 font-heading text-4xl leading-tight">Daftar program</h1>
         <p className="mt-3 text-lg leading-8 text-muted-foreground">
-          Isi nama program, lokasi, tarikh, dan masa. Rekod disimpan di Supabase
-          dan terus muncul pada senarai program.
+          Isi nama program, lokasi, tarikh, dan masa. Selepas disimpan, kongsi kod
+          QR atau pautan supaya peserta mengisi borang kehadiran.
         </p>
       </section>
 
@@ -49,18 +66,16 @@ export default function RegisterProgramPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <RegisterProgramForm action={registerProgram} />
+          <RegisterProgramForm action={registerProgram} origin={origin} />
         </CardContent>
       </Card>
 
-      <Suspense fallback={<p className="text-sm text-muted-foreground">Memuatkan rekod...</p>}>
-        <SavedPrograms />
-      </Suspense>
+      <SavedPrograms origin={origin} />
     </div>
   )
 }
 
-async function SavedPrograms() {
+async function SavedPrograms({ origin }: { origin: string }) {
   await connection()
   let programs: Program[] = []
   let loadError = ""
@@ -103,6 +118,7 @@ async function SavedPrograms() {
                   <TableHead>Lokasi</TableHead>
                   <TableHead>Tarikh Program</TableHead>
                   <TableHead>Masa</TableHead>
+                  <TableHead>Kongsi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -116,6 +132,19 @@ async function SavedPrograms() {
                     <TableCell>{program.venue || "—"}</TableCell>
                     <TableCell>{formatDate(program.eventDate)}</TableCell>
                     <TableCell>{formatTime(program.eventTime) || "—"}</TableCell>
+                    <TableCell>
+                      <details>
+                        <summary className="cursor-pointer text-sm font-semibold text-primary">
+                          QR dan pautan
+                        </summary>
+                        <div className="min-w-72 py-3">
+                          <ProgramShare
+                            url={attendanceUrl(origin, program.slug)}
+                            title={program.title}
+                          />
+                        </div>
+                      </details>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

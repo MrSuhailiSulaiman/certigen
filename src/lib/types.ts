@@ -60,6 +60,7 @@ export type FormState = {
   error?: string
   fieldErrors?: Record<string, string>
   saved?: SavedProgram
+  notice?: string
 } | null
 
 export interface AttendanceStore {

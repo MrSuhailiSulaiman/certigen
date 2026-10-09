@@ -4,11 +4,12 @@ Aplikasi web untuk merekod kehadiran program dan menjana sijil penyertaan PDF be
 
 ## Aliran
 
-1. Buka `/daftar` dan isi nama program, lokasi, tarikh, serta masa. Rekod disimpan di Supabase.
-2. Penganjur boleh masuk ke panel `/urus` untuk menambah tempat, penganjur, dan penandatangan.
-3. Peserta buka program, isi nama penuh dan no. kad pengenalan.
-4. Sistem simpan kehadiran di Supabase, kemudian peserta muat turun sijil PDF A4.
-5. No. kad pengenalan yang sama untuk program yang sama boleh memuat turun sijil semula tanpa rekod berganda.
+1. Admin masuk di `/login`, kemudian daftar guru di `/urus/guru`.
+2. Guru masuk dan buka `/daftar` untuk isi nama program, lokasi, tarikh, serta masa. Rekod disimpan di Supabase.
+3. Setiap program boleh dikongsi melalui kod QR atau pautan salin. Pautan itu membuka borang kehadiran.
+4. Peserta buka pautan, isi nama penuh dan no. kad pengenalan. Peserta tidak perlu akaun.
+5. Sistem simpan kehadiran di Supabase, kemudian peserta muat turun sijil PDF A4.
+6. No. kad pengenalan yang sama untuk program yang sama boleh memuat turun sijil semula tanpa rekod berganda.
 
 ## Jalankan secara tempatan
 
@@ -19,9 +20,9 @@ npm run dev
 
 Pelayan pembangunan: [http://127.0.0.1:43123](http://127.0.0.1:43123) jika anda memulakannya dengan `--port 43123`. `npm run dev` biasa menggunakan port 3000.
 
-Tanpa pembolehubah Supabase, rekod ditulis ke `data/store.json` pada mesin pembangunan. Fail itu tidak dihantar ke git dan tidak kekal pada fungsi Vercel. Dua program contoh dimuatkan supaya borang dan sijil boleh diuji serta-merta.
+Tanpa pembolehubah Supabase, rekod program ditulis ke `data/store.json` dan akaun ditulis ke `data/users.json` pada mesin pembangunan. Fail itu tidak dihantar ke git dan tidak kekal pada fungsi Vercel. Dua program contoh dimuatkan supaya borang dan sijil boleh diuji serta-merta.
 
-PIN panel penganjur dalam pembangunan, jika `ORGANIZER_PIN` belum ditetapkan: `hadir-2026`.
+Akaun admin awal dicipta secara automatik: nama pengguna `admin`, kata laluan `admin123`. Admin mendaftar guru. Guru dan admin boleh menambah program. Tukar kata laluan admin jika aplikasi dibuka kepada umum.
 
 ## Projek yang disambungkan
 
@@ -48,8 +49,8 @@ vercel env pull .env.local --yes
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` atau `SUPABASE_URL` | URL projek Supabase |
 | `SUPABASE_ANON_KEY` atau `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Kunci anon. Cukup untuk borang kehadiran selepas migrasi SQL dijalankan. |
-| `SUPABASE_SERVICE_ROLE_KEY` atau `SUPABASE_SECRET_KEY` | Pilihan. Kunci pelayan yang memintas RLS. |
-| `ORGANIZER_PIN` | PIN panel `/urus`. Minimum 4 aksara. |
+| `SUPABASE_SERVICE_ROLE_KEY` atau `SUPABASE_SECRET_KEY` | Diperlukan untuk mendaftar admin dan guru dalam Supabase Auth. |
+| `AUTH_SECRET` | Pilihan. Rahsia tandatangan sesi. Jika kosong, kunci service role digunakan. |
 
 6. Deploy semula selepas pembolehubah dan jadual sedia. Banner di atas halaman bertukar kepada “disimpan di Supabase” apabila sambungan berjaya.
 

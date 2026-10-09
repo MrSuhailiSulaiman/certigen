@@ -4,6 +4,7 @@ import { connection } from "next/server"
 
 import { ProgramCard } from "@/components/program-card"
 import { buttonVariants } from "@/components/ui/button"
+import { getSession } from "@/lib/auth"
 import {
   Card,
   CardContent,
@@ -17,7 +18,7 @@ import { cn } from "@/lib/utils"
 const steps = [
   {
     title: "Cipta program",
-    body: "Isi nama program, lokasi, tarikh, dan masa pada borang daftar.",
+    body: "Guru atau admin isi nama program, lokasi, tarikh, dan masa, kemudian kongsi pautan.",
   },
   {
     title: "Isi kehadiran",
@@ -65,15 +66,28 @@ export default function HomePage() {
       <section className="mt-14">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
           <h2 className="font-heading text-2xl">Program</h2>
-          <Link href="/daftar" className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}>
-            Daftar program
-          </Link>
+          <Suspense fallback={null}>
+            <RegisterLink />
+          </Suspense>
         </div>
         <Suspense fallback={<ProgramListFallback />}>
           <ProgramList />
         </Suspense>
       </section>
     </div>
+  )
+}
+
+async function RegisterLink() {
+  await connection()
+  const session = await getSession()
+  return (
+    <Link
+      href={session ? "/daftar" : "/login?next=/daftar"}
+      className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}
+    >
+      {session ? "Daftar program" : "Masuk untuk daftar"}
+    </Link>
   )
 }
 
@@ -88,6 +102,7 @@ function ProgramListFallback() {
 
 async function ProgramList() {
   await connection()
+  const session = await getSession()
   let programs: Program[] = []
   let loadError = ""
   try {
@@ -121,8 +136,11 @@ async function ProgramList() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link href="/daftar" className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}>
-            Daftar program
+          <Link
+            href={session ? "/daftar" : "/login?next=/daftar"}
+            className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}
+          >
+            {session ? "Daftar program" : "Masuk untuk daftar"}
           </Link>
         </CardContent>
       </Card>

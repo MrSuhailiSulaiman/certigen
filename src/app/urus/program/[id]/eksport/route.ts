@@ -1,6 +1,6 @@
 import { connection } from "next/server"
 
-import { isOrganizer } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { formatDateTime, formatIdentity } from "@/lib/format"
 import { getStore } from "@/lib/store"
 
@@ -14,7 +14,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ) {
   await connection()
-  if (!(await isOrganizer())) {
+  if (!(await getSession())) {
     return new Response("Tidak dibenarkan.", { status: 401 })
   }
   const { id } = await context.params

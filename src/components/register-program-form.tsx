@@ -4,6 +4,7 @@ import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 import Link from "next/link"
 
+import { ProgramShare } from "@/components/program-share"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -46,8 +47,10 @@ function Field({
 
 export function RegisterProgramForm({
   action,
+  origin,
 }: {
   action: (state: FormState, formData: FormData) => Promise<FormState>
+  origin: string
 }) {
   const [state, formAction] = useActionState<FormState, FormData>(action, null)
   const errors = state?.fieldErrors ?? {}
@@ -79,6 +82,7 @@ export function RegisterProgramForm({
               <dd>{formatTime(saved.eventTime)}</dd>
             </div>
           </dl>
+          <ProgramShare url={`${origin}/program/${saved.slug}`} title={saved.title} />
           <Link
             href={`/program/${saved.slug}`}
             className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10 w-fit px-4")}

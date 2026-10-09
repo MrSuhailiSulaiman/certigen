@@ -107,8 +107,31 @@ export const programRegistrationSchema = z.object({
   eventTime: timeField,
 })
 
-export const pinSchema = z.object({
-  pin: z.string().trim().min(4, "PIN terlalu pendek.").max(80),
+const usernameField = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .regex(
+    /^[a-z0-9][a-z0-9._-]{2,31}$/,
+    "Nama pengguna 3–32 aksara: huruf kecil, nombor, titik, garis atau garis bawah.",
+  )
+
+export const loginSchema = z.object({
+  username: usernameField,
+  password: z.string().min(1, "Kata laluan diperlukan.").max(80),
+})
+
+export const guruSchema = z.object({
+  displayName: z
+    .string()
+    .trim()
+    .min(2, "Nama guru diperlukan.")
+    .max(120, "Nama guru terlalu panjang."),
+  username: usernameField,
+  password: z
+    .string()
+    .min(6, "Kata laluan sekurang-kurangnya 6 aksara.")
+    .max(80, "Kata laluan terlalu panjang."),
 })
 
 export function fieldErrors(error: z.ZodError) {

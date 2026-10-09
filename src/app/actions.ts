@@ -3,13 +3,15 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import { isOrganizer, startOrganizerSession, endOrganizerSession } from "@/lib/auth"
+import { endSession, getSession, safeNext, startSession } from "@/lib/auth"
 import { normalizeIdentity } from "@/lib/format"
 import { getStore, StoreError } from "@/lib/store"
 import type { FormState } from "@/lib/types"
+import { ensureAdmin, authenticate, registerGuru, type Account } from "@/lib/users"
 import {
   fieldErrors,
-  pinSchema,
+  guruSchema,
+  loginSchema,
   readAttendance,
   readProgram,
   readProgramRegistration,
@@ -71,26 +73,46 @@ export async function lookupAttendance(
   redirect(`/sijil/${attendanceId}`)
 }
 
-export async function loginOrganizer(
+export async function login(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const parsed = pinSchema.safeParse({ pin: formData.get("pin") })
+  const parsed = loginSchema.safeParse({
+    username: formData.get("username"),
+    password: formData.get("password"),
+  })
   if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) }
-  const ok = await startOrganizerSession(parsed.data.pin)
-  if (!ok) return { error: "PIN tidak sepadan." }
-  redirect("/urus")
+
+  let account: Account | null = null
+  try {
+    await ensureAdmin()
+    account = await authenticate(parsed.data.username, parsed.data.password)
+  } catch (error) {
+    return failure(error)
+  }
+  if (!account) return { error: "Nama pengguna atau kata laluan tidak sepadan." }
+  await startSession(account)
+  redirect(safeNext(formData.get("next")) ?? "/urus")
 }
 
-export async function logoutOrganizer() {
-  await endOrganizerSession()
-  redirect("/urus")
+export async function logout() {
+  await endSession()
+  redirect("/login")
+}
+
+async function requireStaff() {
+  const session = await getSession()
+  if (!session) return null
+  return session
 }
 
 export async function registerProgram(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  if (!(await requireStaff())) {
+    return { error: "Sila masuk sebagai guru atau admin untuk mendaftar program." }
+  }
   const parsed = readProgramRegistration(formData)
   if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) }
 
@@ -129,7 +151,7 @@ export async function createProgram(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  if (!(await isOrganizer())) return { error: "Sesi penganjur telah tamat." }
+  if (!(await requireStaff())) return { error: "Sesi telah tamat. Sila masuk semula." }
   const parsed = readProgram(formData)
   if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) }
 
@@ -150,7 +172,7 @@ export async function updateProgram(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  if (!(await isOrganizer())) return { error: "Sesi penganjur telah tamat." }
+  if (!(await requireStaff())) return { error: "Sesi telah tamat. Sila masuk semula." }
   const parsed = readProgram(formData)
   if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) }
 
@@ -168,8 +190,32 @@ export async function updateProgram(
   redirect(`/urus/program/${id}`)
 }
 
+export async function registerTeacher(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const session = await getSession()
+  if (session?.role !== "admin") {
+    return { error: "Hanya admin boleh mendaftar guru." }
+  }
+  const parsed = guruSchema.safeParse({
+    displayName: formData.get("displayName"),
+    username: formData.get("username"),
+    password: formData.get("password"),
+  })
+  if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) }
+
+  try {
+    const guru = await registerGuru(parsed.data)
+    revalidatePath("/urus/guru")
+    return { notice: `Guru ${guru.displayName} telah didaftarkan.` }
+  } catch (error) {
+    return failure(error)
+  }
+}
+
 export async function toggleProgram(formData: FormData) {
-  if (!(await isOrganizer())) redirect("/urus")
+  if (!(await requireStaff())) redirect("/login?next=/urus")
   const id = String(formData.get("id") ?? "")
   const isOpen = formData.get("isOpen") === "true"
   try {
