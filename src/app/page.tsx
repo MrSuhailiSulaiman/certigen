@@ -21,7 +21,7 @@ const steps = [
   },
   {
     title: "Isi kehadiran",
-    body: "Peserta tulis nama, e-mel, dan organisasi pada borang program.",
+    body: "Peserta tulis nama penuh dan no. kad pengenalan pada borang program.",
   },
   {
     title: "Muat turun sijil",

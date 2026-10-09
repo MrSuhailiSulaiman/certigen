@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { normalizeIdentity } from "@/lib/format"
 import type { AttendanceInput, ProgramInput } from "@/lib/types"
 
 const dateField = z
@@ -31,22 +32,11 @@ export const attendanceSchema = z.object({
     .trim()
     .min(2, "Nama penuh diperlukan.")
     .max(120, "Nama terlalu panjang."),
-  email: z
+  identityNo: z
     .string()
     .trim()
-    .max(160, "E-mel terlalu panjang.")
-    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "E-mel tidak sah.")
-    .transform((value) => value.toLowerCase()),
-  organization: z
-    .string()
-    .trim()
-    .min(2, "Nyatakan organisasi, atau tulis Individu.")
-    .max(160, "Organisasi terlalu panjang."),
-  phone: z
-    .string()
-    .trim()
-    .max(30, "No. telefon terlalu panjang.")
-    .regex(/^[0-9+\-\s()]*$/, "No. telefon tidak sah."),
+    .transform(normalizeIdentity)
+    .refine((value) => /^\d{12}$/.test(value), "No. kad pengenalan mesti 12 digit."),
 })
 
 export const programSchema = z
@@ -131,9 +121,7 @@ export function readAttendance(formData: FormData) {
   return attendanceSchema.safeParse({
     programId: formData.get("programId"),
     fullName: formData.get("fullName"),
-    email: formData.get("email"),
-    organization: formData.get("organization"),
-    phone: formData.get("phone") ?? "",
+    identityNo: formData.get("identityNo") ?? "",
   })
 }
 

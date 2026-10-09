@@ -3,7 +3,7 @@ import assert from "node:assert/strict"
 import { PDFDocument } from "pdf-lib"
 
 import { buildCertificatePdf } from "../src/lib/certificate-pdf"
-import { formatTime } from "../src/lib/format"
+import { formatIdentity, formatTime } from "../src/lib/format"
 import { attendanceSchema, programRegistrationSchema } from "../src/lib/validators"
 
 async function main() {
@@ -11,9 +11,7 @@ const bytes = await buildCertificatePdf({
   id: "6f1c2a40-7b21-4a1e-9c31-0a11b2c3d4e5",
   programId: "8a2d4b51-1c32-4f6e-8d42-1b22c3d4e5f6",
   fullName: "Nur Aisyah binti Karim",
-  email: "aisyah@contoh.my",
-  organization: "Sekolah Contoh",
-  phone: "0123456789",
+  identityNo: "990101145678",
   certificateNo: "ES-2026-6F1C2A",
   createdAt: "2026-10-08T04:00:00.000Z",
   program: {
@@ -44,19 +42,16 @@ assert.ok(Math.abs(height - 841.89) < 0.2, `height ${height}`)
 const valid = attendanceSchema.safeParse({
   programId: "6f1c2a40-7b21-4a1e-9c31-0a11b2c3d4e5",
   fullName: "Nur Aisyah",
-  email: "Aisyah@Contoh.my",
-  organization: "Sekolah Contoh",
-  phone: "",
+  identityNo: "990101-14-5678",
 })
 assert.equal(valid.success, true)
-if (valid.success) assert.equal(valid.data.email, "aisyah@contoh.my")
+if (valid.success) assert.equal(valid.data.identityNo, "990101145678")
+assert.equal(formatIdentity("990101145678"), "990101-14-5678")
 
 const invalid = attendanceSchema.safeParse({
   programId: "bukan-uuid",
   fullName: "A",
-  email: "bukan-emel",
-  organization: "",
-  phone: "abc",
+  identityNo: "123",
 })
 assert.equal(invalid.success, false)
 

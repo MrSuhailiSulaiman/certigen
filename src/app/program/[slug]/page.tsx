@@ -95,7 +95,7 @@ async function ProgramBody({ params }: { params: Promise<{ slug: string }> }) {
             ) : (
               <p>
                 Pendaftaran kehadiran untuk program ini telah ditutup. Jika anda
-                sudah mendaftar, cari sijil dengan e-mel di bawah.
+                sudah mendaftar, cari sijil dengan no. kad pengenalan di bawah.
               </p>
             )}
           </CardContent>
@@ -103,7 +103,9 @@ async function ProgramBody({ params }: { params: Promise<{ slug: string }> }) {
         <Card>
           <CardHeader>
             <h2 className="font-heading text-xl">Sudah mendaftar?</h2>
-            <CardDescription>Muat turun semula sijil dengan e-mel yang sama.</CardDescription>
+            <CardDescription>
+              Muat turun semula sijil dengan no. kad pengenalan yang sama.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Separator className="mb-4" />

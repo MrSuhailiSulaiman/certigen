@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
 import { isOrganizer, startOrganizerSession, endOrganizerSession } from "@/lib/auth"
+import { normalizeIdentity } from "@/lib/format"
 import { getStore, StoreError } from "@/lib/store"
 import type { FormState } from "@/lib/types"
 import {
@@ -50,19 +51,17 @@ export async function lookupAttendance(
   formData: FormData,
 ): Promise<FormState> {
   const programId = String(formData.get("programId") ?? "")
-  const email = String(formData.get("email") ?? "")
-    .trim()
-    .toLowerCase()
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { fieldErrors: { email: "E-mel tidak sah." } }
+  const identityNo = normalizeIdentity(String(formData.get("identityNo") ?? ""))
+  if (!/^\d{12}$/.test(identityNo)) {
+    return { fieldErrors: { identityNo: "No. kad pengenalan mesti 12 digit." } }
   }
 
   let attendanceId = ""
   try {
-    const attendance = await getStore().findAttendanceByEmail(programId, email)
+    const attendance = await getStore().findAttendanceByIdentity(programId, identityNo)
     if (!attendance) {
       return {
-        error: "E-mel ini belum direkod untuk program tersebut.",
+        error: "No. kad pengenalan ini belum direkod untuk program tersebut.",
       }
     }
     attendanceId = attendance.id

@@ -6,9 +6,9 @@ Aplikasi web untuk merekod kehadiran program dan menjana sijil penyertaan PDF be
 
 1. Buka `/daftar` dan isi nama program, tarikh, serta masa. Rekod disimpan di Supabase.
 2. Penganjur boleh masuk ke panel `/urus` untuk menambah tempat, penganjur, dan penandatangan.
-3. Peserta buka program, isi nama, e-mel, organisasi, dan nombor telefon.
-4. Sistem simpan kehadiran, kemudian peserta muat turun sijil PDF A4.
-5. E-mel yang sama untuk program yang sama boleh memuat turun sijil semula tanpa rekod berganda.
+3. Peserta buka program, isi nama penuh dan no. kad pengenalan.
+4. Sistem simpan kehadiran di Supabase, kemudian peserta muat turun sijil PDF A4.
+5. No. kad pengenalan yang sama untuk program yang sama boleh memuat turun sijil semula tanpa rekod berganda.
 
 ## Jalankan secara tempatan
 
@@ -41,7 +41,7 @@ vercel integration add supabase
 vercel env pull .env.local --yes
 ```
 
-4. Dalam Supabase SQL Editor, jalankan `supabase/migrations/20261008120000_init.sql`. Jika jadual sudah wujud sebelum lajur masa ditambah, jalankan juga `supabase/migrations/20261009120000_program_time.sql`. Skrip ini mencipta jadual `programs` dan `attendance`, menyimpan nama, tarikh, dan masa program, kemudian membenarkan kunci anon membaca program, menulis kehadiran, dan mengurus program.
+4. Dalam Supabase SQL Editor, jalankan `supabase/migrations/20261008120000_init.sql`. Jika jadual sudah wujud, jalankan juga `supabase/migrations/20261009120000_program_time.sql` dan `supabase/migrations/20261009140000_attendance_identity.sql`. Skrip ini mencipta jadual `programs` dan `attendance`, menyimpan nama, tarikh, masa, serta no. kad pengenalan, kemudian membenarkan kunci anon membaca program dan menulis kehadiran.
 5. Pastikan pembolehubah berikut wujud pada Vercel untuk Production, Preview, dan Development:
 
 | Nama | Kegunaan |

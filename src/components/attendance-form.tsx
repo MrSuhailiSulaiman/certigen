@@ -68,43 +68,23 @@ export function AttendanceForm({ programId }: { programId: string }) {
           aria-describedby={errors.fullName ? "fullName-error" : undefined}
         />
       </Field>
-      <Field id="email" label="E-mel" error={errors.email}>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          className="h-11"
-          aria-invalid={Boolean(errors.email)}
-          aria-describedby={errors.email ? "email-error" : undefined}
-        />
-      </Field>
       <Field
-        id="organization"
-        label="Organisasi atau institusi"
-        hint="Tulis Individu jika anda hadir secara persendirian."
-        error={errors.organization}
+        id="identityNo"
+        label="No. kad pengenalan"
+        hint="12 digit. Sempang dibenarkan, contoh 990101-14-1234."
+        error={errors.identityNo}
       >
         <Input
-          id="organization"
-          name="organization"
-          autoComplete="organization"
+          id="identityNo"
+          name="identityNo"
+          inputMode="numeric"
+          autoComplete="off"
           required
+          maxLength={14}
+          placeholder="990101-14-1234"
           className="h-11"
-          aria-invalid={Boolean(errors.organization)}
-          aria-describedby={errors.organization ? "organization-error" : undefined}
-        />
-      </Field>
-      <Field id="phone" label="No. telefon" hint="Pilihan." error={errors.phone}>
-        <Input
-          id="phone"
-          name="phone"
-          type="tel"
-          autoComplete="tel"
-          className="h-11"
-          aria-invalid={Boolean(errors.phone)}
-          aria-describedby={errors.phone ? "phone-error" : undefined}
+          aria-invalid={Boolean(errors.identityNo)}
+          aria-describedby={errors.identityNo ? "identityNo-error" : undefined}
         />
       </Field>
       <SubmitButton />

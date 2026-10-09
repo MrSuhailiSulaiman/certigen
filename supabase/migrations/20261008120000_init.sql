@@ -24,13 +24,17 @@ create table if not exists public.attendance (
   id uuid primary key,
   program_id uuid not null references public.programs (id) on delete cascade,
   full_name text not null,
-  email text not null,
+  no_kad_pengenalan text not null default '',
+  email text not null default '',
   organization text not null default '',
   phone text not null default '',
   certificate_no text not null unique,
-  created_at timestamptz not null default now(),
-  unique (program_id, email)
+  created_at timestamptz not null default now()
 );
+
+create unique index if not exists attendance_program_identity_uidx
+  on public.attendance (program_id, no_kad_pengenalan)
+  where no_kad_pengenalan <> '';
 
 create index if not exists attendance_program_idx
   on public.attendance (program_id, created_at desc);

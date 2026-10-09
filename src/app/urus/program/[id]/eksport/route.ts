@@ -1,7 +1,7 @@
 import { connection } from "next/server"
 
 import { isOrganizer } from "@/lib/auth"
-import { formatDateTime } from "@/lib/format"
+import { formatDateTime, formatIdentity } from "@/lib/format"
 import { getStore } from "@/lib/store"
 
 function cell(value: string) {
@@ -24,15 +24,13 @@ export async function GET(
     return new Response("Program tidak dijumpai.", { status: 404 })
   }
   const rows = await store.listAttendance(id)
-  const header = ["Nama", "E-mel", "Organisasi", "Telefon", "No. sijil", "Masa"]
+  const header = ["Nama penuh", "No. kad pengenalan", "No. sijil", "Masa"]
   const lines = [
     header.join(","),
     ...rows.map((row) =>
       [
         row.fullName,
-        row.email,
-        row.organization,
-        row.phone,
+        formatIdentity(row.identityNo),
         row.certificateNo,
         formatDateTime(row.createdAt),
       ]

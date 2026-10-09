@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/table"
 import { buttonVariants } from "@/components/ui/button"
 import { isOrganizer } from "@/lib/auth"
-import { formatDateTime } from "@/lib/format"
+import { formatDateTime, formatIdentity } from "@/lib/format"
 import { getStore } from "@/lib/store"
 import { cn } from "@/lib/utils"
 
@@ -112,10 +112,8 @@ async function OrganizerProgramBody({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nama</TableHead>
-                  <TableHead>E-mel</TableHead>
-                  <TableHead>Organisasi</TableHead>
-                  <TableHead>Telefon</TableHead>
+                  <TableHead>Nama penuh</TableHead>
+                  <TableHead>No. kad pengenalan</TableHead>
                   <TableHead>No. sijil</TableHead>
                   <TableHead>Masa</TableHead>
                 </TableRow>
@@ -124,9 +122,7 @@ async function OrganizerProgramBody({
                 {attendance.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell>{row.fullName}</TableCell>
-                    <TableCell>{row.email}</TableCell>
-                    <TableCell>{row.organization}</TableCell>
-                    <TableCell>{row.phone || "—"}</TableCell>
+                    <TableCell>{formatIdentity(row.identityNo)}</TableCell>
                     <TableCell>
                       <Link href={`/sijil/${row.id}`} className="underline">
                         {row.certificateNo}

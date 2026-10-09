@@ -5,7 +5,7 @@ import { Suspense } from "react"
 
 import { CertificateSheet } from "@/components/certificate-sheet"
 import { buttonVariants } from "@/components/ui/button"
-import { certificateFilename } from "@/lib/format"
+import { certificateFilename, formatIdentity } from "@/lib/format"
 import { getStore } from "@/lib/store"
 import { cn } from "@/lib/utils"
 
@@ -53,8 +53,8 @@ async function CertificateBody({
             : "Sijil penyertaan anda sudah sedia."}
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          {record.fullName} direkod untuk {record.program.title}. Fail PDF
-          menggunakan saiz kertas A4.
+          {record.fullName} ({formatIdentity(record.identityNo)}) direkod untuk{" "}
+          {record.program.title}. Fail PDF menggunakan saiz kertas A4.
         </p>
         <div className="mt-5 grid gap-2">
           <a

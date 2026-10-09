@@ -33,6 +33,7 @@ type AttendanceRow = {
   id: string
   program_id: string
   full_name: string
+  no_kad_pengenalan?: string | null
   email: string
   organization: string
   phone: string
@@ -90,17 +91,43 @@ function toProgram(row: ProgramRow): Program {
   }
 }
 
+function digits(value: string | null | undefined) {
+  return (value ?? "").replace(/\D/g, "")
+}
+
+function identityFromRow(row: AttendanceRow) {
+  for (const value of [row.no_kad_pengenalan, row.phone, row.email]) {
+    const identity = digits(value)
+    if (/^\d{12}$/.test(identity)) return identity
+  }
+  return (row.no_kad_pengenalan ?? "").trim()
+}
+
 function toAttendance(row: AttendanceRow): Attendance {
   return {
     id: row.id,
     programId: row.program_id,
     fullName: row.full_name,
-    email: row.email,
-    organization: row.organization,
-    phone: row.phone,
+    identityNo: identityFromRow(row),
     certificateNo: row.certificate_no,
     createdAt: row.created_at,
   }
+}
+
+let identityColumn: boolean | null = null
+
+async function hasIdentityColumn(supabase: SupabaseClient) {
+  if (identityColumn !== null) return identityColumn
+  const { error } = await supabase.from("attendance").select("no_kad_pengenalan").limit(1)
+  if (!error) {
+    identityColumn = true
+    return true
+  }
+  if (error.code === "PGRST204" || error.message.includes("no_kad_pengenalan")) {
+    identityColumn = false
+    return false
+  }
+  fail(error)
 }
 
 function programPayload(input: ProgramInput, extra?: { id?: string; slug?: string }) {
@@ -213,28 +240,27 @@ export const supabaseStore: AttendanceStore = {
       )
     }
 
-    const email = input.email.toLowerCase()
-    const existing = await this.findAttendanceByEmail(program.id, email)
+    const identityNo = input.identityNo
+    const existing = await this.findAttendanceByIdentity(program.id, identityNo)
     if (existing) return { attendance: existing, alreadyRecorded: true }
 
     const id = crypto.randomUUID()
-    const { data, error } = await supabase
-      .from("attendance")
-      .insert({
-        id,
-        program_id: program.id,
-        full_name: input.fullName,
-        email,
-        organization: input.organization,
-        phone: input.phone,
-        certificate_no: certificateNumber(id, program.eventDate),
-      })
-      .select("*")
-      .single()
+    const withIdentityColumn = await hasIdentityColumn(supabase)
+    const row: Record<string, string> = {
+      id,
+      program_id: program.id,
+      full_name: input.fullName,
+      email: identityNo,
+      organization: "",
+      phone: identityNo,
+      certificate_no: certificateNumber(id, program.eventDate),
+    }
+    if (withIdentityColumn) row.no_kad_pengenalan = identityNo
+    const { data, error } = await supabase.from("attendance").insert(row).select("*").single()
 
     if (error) {
       if (error.code === "23505") {
-        const again = await this.findAttendanceByEmail(program.id, email)
+        const again = await this.findAttendanceByIdentity(program.id, identityNo)
         if (again) return { attendance: again, alreadyRecorded: true }
       }
       fail(error)
@@ -257,14 +283,14 @@ export const supabaseStore: AttendanceStore = {
     return { ...attendance, program }
   },
 
-  async findAttendanceByEmail(programId, email) {
+  async findAttendanceByIdentity(programId, identityNo) {
     const supabase = client()
-    const { data, error } = await supabase
-      .from("attendance")
-      .select("*")
-      .eq("program_id", programId)
-      .eq("email", email.toLowerCase())
-      .maybeSingle()
+    const withIdentityColumn = await hasIdentityColumn(supabase)
+    let query = supabase.from("attendance").select("*").eq("program_id", programId)
+    query = withIdentityColumn
+      ? query.or(`no_kad_pengenalan.eq.${identityNo},phone.eq.${identityNo},email.eq.${identityNo}`)
+      : query.or(`phone.eq.${identityNo},email.eq.${identityNo}`)
+    const { data, error } = await query.maybeSingle()
     if (error) fail(error)
     return data ? toAttendance(data as AttendanceRow) : null
   },

@@ -19,9 +19,7 @@ export type Attendance = {
   id: string
   programId: string
   fullName: string
-  email: string
-  organization: string
-  phone: string
+  identityNo: string
   certificateNo: string
   createdAt: string
 }
@@ -54,9 +52,7 @@ export type SavedProgram = {
 export type AttendanceInput = {
   programId: string
   fullName: string
-  email: string
-  organization: string
-  phone: string
+  identityNo: string
 }
 
 export type FormState = {
@@ -77,9 +73,9 @@ export interface AttendanceStore {
     input: AttendanceInput,
   ): Promise<{ attendance: Attendance; alreadyRecorded: boolean }>
   getAttendance(id: string): Promise<AttendanceWithProgram | null>
-  findAttendanceByEmail(
+  findAttendanceByIdentity(
     programId: string,
-    email: string,
+    identityNo: string,
   ): Promise<Attendance | null>
   listAttendance(programId: string): Promise<Attendance[]>
 }

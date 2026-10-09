@@ -92,6 +92,25 @@ async function writeDatabase(data: Database) {
   await rename(temporary, filePath)
 }
 
+function normalizeAttendance(row: Attendance): Attendance {
+  const legacy = row as Attendance & {
+    email?: string
+    phone?: string
+    identityNo?: string
+  }
+  const fromLegacy = [legacy.identityNo, legacy.phone, legacy.email]
+    .map((value) => (value ?? "").replace(/\D/g, ""))
+    .find((value) => /^\d{12}$/.test(value))
+  return {
+    id: legacy.id,
+    programId: legacy.programId,
+    fullName: legacy.fullName,
+    identityNo: fromLegacy ?? legacy.identityNo ?? "",
+    certificateNo: legacy.certificateNo,
+    createdAt: legacy.createdAt,
+  }
+}
+
 function normalizeProgram(program: Program): Program {
   return {
     ...program,
@@ -187,20 +206,17 @@ export const localStore: AttendanceStore = {
           "Pendaftaran kehadiran untuk program ini telah ditutup.",
         )
       }
-      const email = input.email.toLowerCase()
       const existing = data.attendance.find(
-        (row) => row.programId === program.id && row.email === email,
+        (row) => row.programId === program.id && row.identityNo === input.identityNo,
       )
-      if (existing) return { attendance: existing, alreadyRecorded: true }
+      if (existing) return { attendance: normalizeAttendance(existing), alreadyRecorded: true }
 
       const id = crypto.randomUUID()
       const attendance: Attendance = {
         id,
         programId: program.id,
         fullName: input.fullName,
-        email,
-        organization: input.organization,
-        phone: input.phone,
+        identityNo: input.identityNo,
         certificateNo: certificateNumber(id, program.eventDate),
         createdAt: new Date().toISOString(),
       }
@@ -216,23 +232,22 @@ export const localStore: AttendanceStore = {
     if (!attendance) return null
     const program = data.programs.find((item) => item.id === attendance.programId)
     if (!program) return null
-    return { ...attendance, program: normalizeProgram(program) }
+    return { ...normalizeAttendance(attendance), program: normalizeProgram(program) }
   },
 
-  async findAttendanceByEmail(programId, email) {
+  async findAttendanceByIdentity(programId, identityNo) {
     const data = await readDatabase()
-    const normalized = email.toLowerCase()
-    return (
-      data.attendance.find(
-        (row) => row.programId === programId && row.email === normalized,
-      ) ?? null
+    const attendance = data.attendance.find(
+      (row) => row.programId === programId && normalizeAttendance(row).identityNo === identityNo,
     )
+    return attendance ? normalizeAttendance(attendance) : null
   },
 
   async listAttendance(programId) {
     const data = await readDatabase()
     return data.attendance
       .filter((row) => row.programId === programId)
+      .map(normalizeAttendance)
       .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
   },
 }

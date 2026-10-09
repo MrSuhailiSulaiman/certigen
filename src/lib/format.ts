@@ -14,6 +14,16 @@ export function formatDateRange(start: string, end: string | null) {
   return `${formatDate(start)} hingga ${formatDate(end)}`
 }
 
+export function normalizeIdentity(value: string) {
+  return value.replace(/[\s-]/g, "")
+}
+
+export function formatIdentity(value: string) {
+  const digits = normalizeIdentity(value)
+  if (!/^\d{12}$/.test(digits)) return value.trim()
+  return `${digits.slice(0, 6)}-${digits.slice(6, 8)}-${digits.slice(8)}`
+}
+
 export function formatTime(value: string) {
   const match = /^(\d{2}):(\d{2})$/.exec(value)
   if (!match) return ""

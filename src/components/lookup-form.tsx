@@ -25,10 +25,19 @@ export function LookupForm({ programId }: { programId: string }) {
     <form action={action} className="grid gap-3">
       <input type="hidden" name="programId" value={programId} />
       <div className="grid gap-1.5">
-        <Label htmlFor="lookup-email">E-mel yang digunakan semasa daftar</Label>
-        <Input id="lookup-email" name="email" type="email" required className="h-11" />
-        {state?.fieldErrors?.email ? (
-          <p className="text-sm text-destructive">{state.fieldErrors.email}</p>
+        <Label htmlFor="lookup-identity">No. kad pengenalan yang digunakan semasa daftar</Label>
+        <Input
+          id="lookup-identity"
+          name="identityNo"
+          inputMode="numeric"
+          autoComplete="off"
+          required
+          maxLength={14}
+          placeholder="990101-14-1234"
+          className="h-11"
+        />
+        {state?.fieldErrors?.identityNo ? (
+          <p className="text-sm text-destructive">{state.fieldErrors.identityNo}</p>
         ) : null}
       </div>
       {state?.error ? (
