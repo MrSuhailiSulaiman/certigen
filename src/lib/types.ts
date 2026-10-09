@@ -11,6 +11,8 @@ export type Program = {
   signatoryName: string
   signatoryRole: string
   isOpen: boolean
+  certificateDesign: string
+  hasLogo: boolean
   createdAt: string
   attendanceCount?: number
 }
@@ -39,6 +41,7 @@ export type ProgramInput = {
   signatoryName: string
   signatoryRole: string
   isOpen: boolean
+  certificateDesign: string
 }
 
 export type SavedProgram = {

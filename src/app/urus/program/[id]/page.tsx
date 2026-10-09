@@ -156,8 +156,8 @@ async function OrganizerProgramBody({
         <CardHeader>
           <h2 className="font-heading text-2xl">Kemaskini program</h2>
           <CardDescription>
-            Perubahan tajuk, tarikh, dan penandatangan dipakai pada sijil baharu
-            dan pada muat turun semula.
+            Pilih reka bentuk sijil, muat naik logo, dan kemaskini butiran program.
+            Pilihan ini dipakai pada pratonton serta PDF A4.
           </CardDescription>
         </CardHeader>
         <CardContent>

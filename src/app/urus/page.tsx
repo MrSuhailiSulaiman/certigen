@@ -106,8 +106,8 @@ async function OrganizerBody() {
         <CardHeader>
           <h2 className="font-heading text-2xl">Program baharu</h2>
           <CardDescription>
-            Maklumat ini muncul pada borang peserta dan pada sijil. Borang ringkas
-            di halaman daftar hanya meminta nama, lokasi, tarikh, dan masa.
+            Maklumat ini muncul pada borang peserta dan pada sijil. Pilih satu
+            daripada 10 reka bentuk dan muat naik logo jika ada.
           </CardDescription>
         </CardHeader>
         <CardContent>

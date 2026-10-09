@@ -4,6 +4,13 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
 import { getSession } from "@/lib/auth"
+import {
+  removeCertificateLogo,
+  saveCertificateDesign,
+  saveCertificateLogo,
+  sniffImage,
+} from "@/lib/certificate-assets"
+import type { CertificateDesignId } from "@/lib/certificate-designs"
 import { normalizeIdentity } from "@/lib/format"
 import { getStore, StoreError } from "@/lib/store"
 import type { FormState } from "@/lib/types"
@@ -15,6 +22,26 @@ import {
   readProgram,
   readProgramRegistration,
 } from "@/lib/validators"
+
+async function storeCertificateChoices(programId: string, formData: FormData, design: string) {
+  await saveCertificateDesign(programId, design as CertificateDesignId)
+  const file = formData.get("logo")
+  if (file instanceof File && file.size > 0) {
+    if (file.size > 1_500_000) {
+      throw new StoreError("Logo terlalu besar. Had saiz ialah 1.5 MB.")
+    }
+    const bytes = new Uint8Array(await file.arrayBuffer())
+    const contentType = sniffImage(bytes)
+    if (!contentType) {
+      throw new StoreError("Logo mesti fail PNG atau JPEG.")
+    }
+    await saveCertificateLogo(programId, bytes, contentType)
+    return
+  }
+  if (formData.get("removeLogo") === "on") {
+    await removeCertificateLogo(programId)
+  }
+}
 
 function failure(error: unknown): FormState {
   if (error instanceof StoreError) return { error: error.message }
@@ -100,6 +127,7 @@ export async function registerProgram(
       signatoryName: "",
       signatoryRole: "",
       isOpen: true,
+      certificateDesign: "korporat",
     })
     revalidatePath("/")
     revalidatePath("/daftar")
@@ -131,6 +159,7 @@ export async function createProgram(
   try {
     const program = await getStore().createProgram(parsed.data)
     id = program.id
+    await storeCertificateChoices(program.id, formData, parsed.data.certificateDesign)
     revalidatePath("/")
     revalidatePath("/urus")
   } catch (error) {
@@ -151,6 +180,7 @@ export async function updateProgram(
   let slug = ""
   try {
     const program = await getStore().updateProgram(id, parsed.data)
+    await storeCertificateChoices(program.id, formData, parsed.data.certificateDesign)
     slug = program.slug
     revalidatePath("/")
     revalidatePath("/urus")

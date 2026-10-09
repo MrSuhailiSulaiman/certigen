@@ -3,6 +3,7 @@
 import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 
+import { CertificateDesignPicker, LogoField } from "@/components/certificate-design-picker"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -51,7 +52,7 @@ export function ProgramForm({
   const errors = state?.fieldErrors ?? {}
 
   return (
-    <form action={formAction} className="grid gap-4">
+    <form action={formAction} encType="multipart/form-data" className="grid gap-4">
       {state?.error ? (
         <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
           {state.error}
@@ -127,6 +128,11 @@ export function ProgramForm({
           />
         </Field>
       </div>
+      <CertificateDesignPicker
+        value={program?.certificateDesign}
+        error={errors.certificateDesign}
+      />
+      <LogoField programId={program?.id} hasLogo={program?.hasLogo} />
       <label className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"

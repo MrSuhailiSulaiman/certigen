@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: ["*.trycloudflare.com"],
+      bodySizeLimit: "2mb",
     },
   },
   outputFileTracingIncludes: {

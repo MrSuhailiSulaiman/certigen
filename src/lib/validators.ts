@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { isCertificateDesign } from "@/lib/certificate-designs"
 import { normalizeIdentity } from "@/lib/format"
 import type { AttendanceInput, ProgramInput } from "@/lib/types"
 
@@ -67,6 +68,10 @@ export const programSchema = z
       .max(120, "Nama penandatangan terlalu panjang."),
     signatoryRole: z.string().trim().max(120, "Jawatan terlalu panjang."),
     isOpen: z.boolean(),
+    certificateDesign: z
+      .string()
+      .trim()
+      .refine(isCertificateDesign, "Pilih satu reka bentuk sijil."),
   })
   .superRefine((value, ctx) => {
     if (value.eventEndDate && !/^\d{4}-\d{2}-\d{2}$/.test(value.eventEndDate)) {
@@ -165,6 +170,7 @@ export function readProgram(formData: FormData) {
     signatoryName: formData.get("signatoryName"),
     signatoryRole: formData.get("signatoryRole") ?? "",
     isOpen: formData.get("isOpen") === "on",
+    certificateDesign: formData.get("certificateDesign") ?? "korporat",
   })
 }
 

@@ -1,5 +1,6 @@
 import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js"
 
+import { applyCertificateAssets } from "@/lib/certificate-assets"
 import { certificateNumber, slugify } from "@/lib/format"
 import { getSupabase } from "@/lib/supabase"
 import { StoreError } from "@/lib/errors"
@@ -93,6 +94,8 @@ function toProgram(row: ProgramRow): Program {
     signatoryName: row.signatory_name,
     signatoryRole: row.signatory_role,
     isOpen: row.is_open,
+    certificateDesign: "korporat",
+    hasLogo: false,
     createdAt: row.created_at,
     attendanceCount: row.attendance?.[0]?.count,
   }
@@ -216,7 +219,7 @@ export const supabaseStore: AttendanceStore = {
       .eq("id", id)
       .maybeSingle()
     if (error) fail(error)
-    return data ? toProgram(data as ProgramRow) : null
+    return data ? applyCertificateAssets(toProgram(data as ProgramRow)) : null
   },
 
   async createProgram(input) {

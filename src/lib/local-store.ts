@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises"
 import path from "node:path"
 
+import { applyCertificateAssets } from "@/lib/certificate-assets"
 import { certificateNumber, slugify } from "@/lib/format"
 import type {
   Attendance,
@@ -34,6 +35,8 @@ const seedPrograms: Program[] = [
     signatoryName: "Dr. Amirah Zakaria",
     signatoryRole: "Pengarah Program",
     isOpen: true,
+    certificateDesign: "korporat",
+    hasLogo: false,
     createdAt: "2026-10-01T02:00:00.000Z",
   },
   {
@@ -50,6 +53,8 @@ const seedPrograms: Program[] = [
     signatoryName: "Encik Hafiz Rahman",
     signatoryRole: "Pengerusi Penganjur",
     isOpen: true,
+    certificateDesign: "korporat",
+    hasLogo: false,
     createdAt: "2026-10-02T02:00:00.000Z",
   },
 ]
@@ -120,6 +125,8 @@ function normalizeProgram(program: Program): Program {
     venue: program.venue ?? "",
     signatoryName: program.signatoryName ?? "",
     signatoryRole: program.signatoryRole ?? "",
+    certificateDesign: program.certificateDesign || "korporat",
+    hasLogo: Boolean(program.hasLogo),
   }
 }
 
@@ -155,7 +162,7 @@ export const localStore: AttendanceStore = {
   async getProgramById(id) {
     const data = await readDatabase()
     const program = data.programs.find((item) => item.id === id)
-    return program ? normalizeProgram(program) : null
+    return program ? applyCertificateAssets(normalizeProgram(program)) : null
   },
 
   async createProgram(input: ProgramInput) {
@@ -165,6 +172,7 @@ export const localStore: AttendanceStore = {
         ...input,
         id: crypto.randomUUID(),
         slug: slugify(input.title),
+        hasLogo: false,
         createdAt: new Date().toISOString(),
       }
       data.programs.push(program)
@@ -232,7 +240,10 @@ export const localStore: AttendanceStore = {
     if (!attendance) return null
     const program = data.programs.find((item) => item.id === attendance.programId)
     if (!program) return null
-    return { ...normalizeAttendance(attendance), program: normalizeProgram(program) }
+    return {
+      ...normalizeAttendance(attendance),
+      program: await applyCertificateAssets(normalizeProgram(program)),
+    }
   },
 
   async findAttendanceByIdentity(programId, identityNo) {
