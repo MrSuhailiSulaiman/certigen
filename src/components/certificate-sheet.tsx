@@ -1,112 +1,89 @@
-import { CertificateChrome } from "@/components/certificate-chrome"
-import { getCertificateDesign } from "@/lib/certificate-designs"
-import { formatSchedule } from "@/lib/format"
+import localFont from "next/font/local"
+
+import { CornerRibbons, EventMedallion, GoldSeal } from "@/components/certificate-ornaments"
+import { formatCertificateDate, formatTime } from "@/lib/format"
 import type { AttendanceWithProgram } from "@/lib/types"
+
+const script = localFont({
+  src: "../lib/fonts/GreatVibes-Regular.ttf",
+  display: "swap",
+})
 
 export function CertificateSheet({ record }: { record: AttendanceWithProgram }) {
   const { program } = record
-  const design = getCertificateDesign(program.certificateDesign)
   const logoUrl = program.hasLogo ? `/logo/${program.id}` : null
-  const header = design.chrome === "header" || design.chrome === "header-blue"
+  const year = program.eventDate.slice(0, 4)
+  const when = formatCertificateDate(program.eventDate, program.eventEndDate)
+  const time = formatTime(program.eventTime)
 
   return (
-    <article
-      className="relative mx-auto flex aspect-[210/297] w-full max-w-[640px] flex-col overflow-hidden shadow-lg ring-1 ring-black/10"
-      style={{ background: design.paper, color: design.ink }}
-    >
-      <CertificateChrome design={design} />
-      <div
-        className={`relative z-10 flex min-h-0 flex-1 flex-col px-8 text-center sm:px-12 ${
-          header ? "pt-20" : "pt-10"
-        } ${design.chrome === "panel" ? "pb-20" : "pb-8"} ${design.chrome === "jalur" ? "px-12 sm:px-16" : ""}`}
-      >
+    <article className="relative mx-auto aspect-[210/297] w-full max-w-[680px] overflow-hidden bg-white text-[#1c1c1c] shadow-lg ring-1 ring-black/10">
+      <CornerRibbons />
+      <div className="relative z-10 flex h-full flex-col items-center px-10 pt-7 pb-5 text-center sm:px-14 sm:pt-9">
         {logoUrl ? (
-          // The logo is uploaded by the organiser and served from this app.
+          // Organiser logo, shown in the crest position of the certificate.
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={logoUrl}
-            alt=""
-            className={`mx-auto mb-4 max-h-16 w-auto object-contain ${
-              design.chrome === "navy" ? "bg-white p-1" : ""
-            }`}
-          />
-        ) : design.chrome === "pingat" ? (
-          <div
-            className="mx-auto mb-4 grid size-14 place-items-center rounded-full border-2 text-[10px] font-semibold tracking-widest"
-            style={{ borderColor: design.second, color: design.accent }}
-          >
-            HADIR
-          </div>
-        ) : null}
-
-        {header ? (
-          <p className="absolute inset-x-0 top-5 text-[10px] font-semibold tracking-[0.28em] text-white uppercase">
-            E-sijil kehadiran
-          </p>
+          <img src={logoUrl} alt="" className="h-14 w-auto max-w-[140px] object-contain" />
         ) : (
-          <p
-            className="text-[10px] font-semibold tracking-[0.28em] uppercase"
-            style={{ color: design.second }}
-          >
-            E-sijil kehadiran
-          </p>
+          <div className="grid size-14 place-items-center rounded-full border-2 border-[#e2a30b] text-[10px] font-bold tracking-widest text-[#8d1c24]">
+            SIJIL
+          </div>
         )}
-        <h2
-          className="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: design.chrome === "navy" ? design.ink : design.accent }}
-        >
-          Sijil Penyertaan
+        {program.organizer ? (
+          <p className="mt-2 text-[10px] font-semibold tracking-[0.18em] uppercase sm:text-[11px]">
+            {program.organizer}
+          </p>
+        ) : null}
+        <h2 className={`${script.className} mt-3 mb-1 text-[2.7rem] leading-[1.35] text-[#d31224] sm:text-5xl`}>
+          Sijil Penghargaan
         </h2>
-        <div className="mx-auto mt-4 h-px w-20" style={{ background: design.second }} />
-        <p className="mt-6 text-sm" style={{ color: design.muted }}>
-          Dengan ini disahkan bahawa
+        <p className="mt-1 font-serif text-sm italic text-[#333] sm:text-[15px]">
+          Setinggi-tinggi penghargaan dan tahniah kepada
         </p>
-        <p className="mt-3 font-serif text-2xl leading-tight font-semibold sm:text-3xl">
+        <p className="mt-2 max-w-[95%] text-sm font-bold tracking-wide uppercase sm:text-base">
           {record.fullName}
         </p>
-        <div className="mx-auto mt-3 h-px w-28" style={{ background: design.second }} />
-        <p className="mt-5 text-sm" style={{ color: design.muted }}>
-          telah hadir dan menyertai
+        <p className="mt-3 text-xs italic sm:text-sm">atas sumbangan dan komitmen sebagai</p>
+        <p className="mt-1 text-lg font-bold tracking-[0.14em] text-[#c41624] uppercase sm:text-xl">
+          Peserta
         </p>
-        <p className="mt-3 font-serif text-xl font-semibold" style={{ color: design.accent }}>
+        <p className="mt-2 text-xs italic sm:text-sm">sempena</p>
+        <div className="mt-2">
+          <EventMedallion year={year} />
+        </div>
+        <p className="mt-1 max-w-[90%] text-xs font-bold tracking-wide uppercase sm:text-sm">
           {program.title}
         </p>
-        <p className="mt-4 text-sm">
-          {formatSchedule(program.eventDate, program.eventEndDate, program.eventTime)}
-        </p>
-        {program.venue ? <p className="text-sm">{program.venue}</p> : null}
-        {program.organizer ? <p className="mt-2 text-sm">Anjuran {program.organizer}</p> : null}
-
-        <div className="mt-auto grid grid-cols-[auto_1fr] items-end gap-6 pt-8 text-left">
-          <div>
-            {design.chrome === "pingat" ? null : (
-              <div
-                className="grid size-14 place-items-center rounded-full border-2 text-[10px] font-semibold tracking-widest"
-                style={{ borderColor: design.second, color: design.accent }}
-              >
-                HADIR
-              </div>
-            )}
-            <p
-              className="mt-3 text-[10px] font-semibold tracking-wide uppercase"
-              style={{ color: design.muted }}
-            >
-              No. sijil
-            </p>
-            <p className="text-sm font-semibold">{record.certificateNo}</p>
-          </div>
-          <div className="justify-self-end text-left">
-            <div className="mb-2 h-px w-36" style={{ background: design.ink }} />
-            {program.signatoryName ? (
-              <p className="text-sm font-semibold">{program.signatoryName}</p>
-            ) : null}
-            {program.signatoryRole ? (
-              <p className="text-xs" style={{ color: design.muted }}>
-                {program.signatoryRole}
-              </p>
-            ) : null}
-          </div>
+        {program.description ? (
+          <p className="mt-1 line-clamp-2 max-w-[90%] text-[10px] tracking-[0.14em] text-[#555] uppercase">
+            {program.description}
+          </p>
+        ) : null}
+        <div className="relative mt-2 w-full">
+          <GoldSeal className="absolute top-0 left-0 size-14 sm:size-16" />
+          <p className="text-sm italic">pada</p>
+          <p className="text-sm font-semibold tracking-wide uppercase">{when}</p>
+          {time ? <p className="text-xs text-[#444]">{time}</p> : null}
+          {program.venue ? <p className="text-xs text-[#444]">{program.venue}</p> : null}
         </div>
+
+        <div className="mt-4 ml-auto w-[58%] pr-1 text-right">
+          {program.signatoryName ? (
+            <p className="text-xs font-bold tracking-wide uppercase sm:text-sm">
+              {program.signatoryName}
+            </p>
+          ) : null}
+          {program.signatoryRole ? (
+            <p className="text-[10px] tracking-wide uppercase sm:text-xs">{program.signatoryRole}</p>
+          ) : null}
+          {program.organizer ? (
+            <p className="text-[10px] tracking-wide uppercase sm:text-xs">{program.organizer}</p>
+          ) : null}
+        </div>
+
+        <p className="mt-auto pt-4 text-[9px] tracking-[0.16em] text-[#666] uppercase">
+          No. sijil {record.certificateNo}
+        </p>
       </div>
     </article>
   )

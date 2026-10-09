@@ -34,6 +34,43 @@ export function formatTime(value: string) {
   return `${display}:${minute} ${period}`
 }
 
+const CERTIFICATE_MONTHS = [
+  "JANUARI",
+  "FEBRUARI",
+  "MAC",
+  "APRIL",
+  "MEI",
+  "JUN",
+  "JULAI",
+  "OGOS",
+  "SEPTEMBER",
+  "OKTOBER",
+  "NOVEMBER",
+  "DISEMBER",
+]
+
+export function formatCertificateDate(start: string, end: string | null) {
+  const parse = (iso: string) => {
+    const [year, month, day] = iso.split("-").map(Number)
+    if (!year || !month || !day || month < 1 || month > 12) return null
+    return { year, month, day }
+  }
+  const first = parse(start)
+  if (!first) return start
+  const monthName = CERTIFICATE_MONTHS[first.month - 1]
+  if (!end || end === start) return `${first.day} ${monthName} ${first.year}`
+  const last = parse(end)
+  if (!last) return `${first.day} ${monthName} ${first.year}`
+  if (first.year === last.year && first.month === last.month) {
+    return `${first.day} - ${last.day} ${monthName} ${first.year}`
+  }
+  const lastMonth = CERTIFICATE_MONTHS[last.month - 1]
+  if (first.year === last.year) {
+    return `${first.day} ${monthName} - ${last.day} ${lastMonth} ${first.year}`
+  }
+  return `${first.day} ${monthName} ${first.year} - ${last.day} ${lastMonth} ${last.year}`
+}
+
 export function formatSchedule(start: string, end: string | null, time = "") {
   const date = formatDateRange(start, end)
   const clock = formatTime(time)
@@ -73,5 +110,5 @@ export function certificateFilename(name: string) {
     .trim()
     .replace(/\s+/g, "-")
     .slice(0, 60)
-  return `Sijil-Penyertaan-${safe || "peserta"}.pdf`
+  return `Sijil-Penghargaan-${safe || "peserta"}.pdf`
 }

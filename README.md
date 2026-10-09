@@ -10,7 +10,7 @@ Aplikasi web untuk merekod kehadiran program dan menjana sijil penyertaan PDF be
 4. Peserta buka pautan, isi nama penuh dan no. kad pengenalan. Peserta tidak perlu akaun.
 5. Sistem simpan kehadiran di Supabase, kemudian peserta muat turun sijil PDF A4.
 6. No. kad pengenalan yang sama untuk program yang sama boleh memuat turun sijil semula tanpa rekod berganda.
-7. Semasa urus program, pilih satu daripada 10 reka bentuk sijil dan muat naik logo PNG atau JPEG. Logo dan reka bentuk muncul pada pratonton serta PDF A4.
+7. Semasa urus program, muat naik logo PNG atau JPEG. Logo diletakkan pada sijil penghargaan, bersama reben merah emas, nama peserta, dan butiran program.
 
 ## Jalankan secara tempatan
 

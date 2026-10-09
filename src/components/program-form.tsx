@@ -3,7 +3,7 @@
 import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 
-import { CertificateDesignPicker, LogoField } from "@/components/certificate-design-picker"
+import { LogoField } from "@/components/certificate-design-picker"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -128,10 +128,6 @@ export function ProgramForm({
           />
         </Field>
       </div>
-      <CertificateDesignPicker
-        value={program?.certificateDesign}
-        error={errors.certificateDesign}
-      />
       <LogoField programId={program?.id} hasLogo={program?.hasLogo} />
       <label className="flex items-center gap-2 text-sm">
         <input

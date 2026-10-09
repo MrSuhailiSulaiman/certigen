@@ -4,7 +4,7 @@ import { PDFDocument } from "pdf-lib"
 
 import { certificateDesigns } from "../src/lib/certificate-designs"
 import { buildCertificatePdf } from "../src/lib/certificate-pdf"
-import { formatIdentity, formatTime } from "../src/lib/format"
+import { formatCertificateDate, formatIdentity, formatTime } from "../src/lib/format"
 import { attendanceSchema, programRegistrationSchema, programSchema } from "../src/lib/validators"
 
 const samplePng = Uint8Array.from(
@@ -121,6 +121,7 @@ const registered = programRegistrationSchema.safeParse({
 })
 assert.equal(registered.success, true)
 if (registered.success) assert.equal(registered.data.eventTime, "09:30")
+assert.equal(formatCertificateDate("2026-08-21", "2026-08-23"), "21 - 23 OGOS 2026")
 assert.equal(formatTime("09:00"), "9:00 pagi")
 assert.equal(formatTime("14:30"), "2:30 petang")
 assert.equal(formatTime("20:05"), "8:05 malam")

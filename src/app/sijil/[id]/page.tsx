@@ -51,7 +51,7 @@ async function CertificateBody({
         <h1 className="mt-2 font-heading text-3xl leading-tight">
           {query.sudah === "1"
             ? "Sijil anda sedia dimuat turun semula."
-            : "Sijil penyertaan anda sudah sedia."}
+            : "Sijil penghargaan anda sudah sedia."}
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
           {record.fullName} ({formatIdentity(record.identityNo)}) direkod untuk{" "}
