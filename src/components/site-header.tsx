@@ -18,12 +18,18 @@ export function SiteHeader() {
             </span>
           </span>
         </Link>
-        <nav className="flex items-center gap-1 sm:gap-2">
+        <nav className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
           <Link
             href="/"
             className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "h-10 px-3")}
           >
             Program
+          </Link>
+          <Link
+            href="/daftar"
+            className={cn(buttonVariants({ size: "lg" }), "h-10 px-3")}
+          >
+            Daftar
           </Link>
           <Link
             href="/urus"

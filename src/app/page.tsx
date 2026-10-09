@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils"
 const steps = [
   {
     title: "Cipta program",
-    body: "Penganjur isi tajuk, tarikh, tempat, dan nama penandatangan.",
+    body: "Isi nama program, tarikh, dan masa pada borang daftar.",
   },
   {
     title: "Isi kehadiran",
@@ -62,8 +62,11 @@ export default function HomePage() {
       </ol>
 
       <section className="mt-14">
-        <div className="mb-5 flex items-end justify-between gap-4">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
           <h2 className="font-heading text-2xl">Program</h2>
+          <Link href="/daftar" className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}>
+            Daftar program
+          </Link>
         </div>
         <Suspense fallback={<ProgramListFallback />}>
           <ProgramList />
@@ -112,13 +115,13 @@ async function ProgramList() {
         <CardHeader>
           <h3 className="font-heading text-xl">Belum ada program</h3>
           <CardDescription>
-            Penganjur boleh cipta program di panel urus. Peserta akan nampak
-            program di sini sebaik sahaja ia disimpan.
+            Daftar program baharu dengan nama, tarikh, dan masa. Peserta akan
+            nampak program di sini sebaik sahaja ia disimpan.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link href="/urus" className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}>
-            Buka panel urus
+          <Link href="/daftar" className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}>
+            Daftar program
           </Link>
         </CardContent>
       </Card>

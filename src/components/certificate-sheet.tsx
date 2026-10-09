@@ -1,4 +1,4 @@
-import { formatDateRange } from "@/lib/format"
+import { formatSchedule } from "@/lib/format"
 import type { AttendanceWithProgram } from "@/lib/types"
 
 export function CertificateSheet({ record }: { record: AttendanceWithProgram }) {
@@ -26,10 +26,12 @@ export function CertificateSheet({ record }: { record: AttendanceWithProgram }) 
           </p>
           <p className="mt-3 font-heading text-xl text-[#1f4636]">{program.title}</p>
           <p className="mt-5 text-sm">
-            {formatDateRange(program.eventDate, program.eventEndDate)}
+            {formatSchedule(program.eventDate, program.eventEndDate, program.eventTime)}
           </p>
-          <p className="text-sm">{program.venue}</p>
-          <p className="mt-2 text-sm">Anjuran {program.organizer}</p>
+          {program.venue ? <p className="text-sm">{program.venue}</p> : null}
+          {program.organizer ? (
+            <p className="mt-2 text-sm">Anjuran {program.organizer}</p>
+          ) : null}
           <div className="mt-auto grid grid-cols-[auto_1fr] items-end gap-6 pt-10 text-left">
             <div>
               <div className="grid size-14 place-items-center rounded-full border border-[#a88445] text-[10px] font-semibold tracking-widest text-[#1f4636]">
@@ -42,7 +44,9 @@ export function CertificateSheet({ record }: { record: AttendanceWithProgram }) 
             </div>
             <div className="justify-self-end text-left">
               <div className="mb-2 h-px w-36 bg-[#243028]" />
-              <p className="text-sm font-semibold">{program.signatoryName}</p>
+              {program.signatoryName ? (
+                <p className="text-sm font-semibold">{program.signatoryName}</p>
+              ) : null}
               {program.signatoryRole ? (
                 <p className="text-xs italic text-[#62584c]">{program.signatoryRole}</p>
               ) : null}

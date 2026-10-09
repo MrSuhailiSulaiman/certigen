@@ -7,6 +7,7 @@ export type Program = {
   venue: string
   eventDate: string
   eventEndDate: string | null
+  eventTime: string
   signatoryName: string
   signatoryRole: string
   isOpen: boolean
@@ -36,9 +37,18 @@ export type ProgramInput = {
   venue: string
   eventDate: string
   eventEndDate: string | null
+  eventTime: string
   signatoryName: string
   signatoryRole: string
   isOpen: boolean
+}
+
+export type SavedProgram = {
+  id: string
+  slug: string
+  title: string
+  eventDate: string
+  eventTime: string
 }
 
 export type AttendanceInput = {
@@ -52,6 +62,7 @@ export type AttendanceInput = {
 export type FormState = {
   error?: string
   fieldErrors?: Record<string, string>
+  saved?: SavedProgram
 } | null
 
 export interface AttendanceStore {

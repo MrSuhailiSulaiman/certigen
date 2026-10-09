@@ -3,7 +3,8 @@ import assert from "node:assert/strict"
 import { PDFDocument } from "pdf-lib"
 
 import { buildCertificatePdf } from "../src/lib/certificate-pdf"
-import { attendanceSchema } from "../src/lib/validators"
+import { formatTime } from "../src/lib/format"
+import { attendanceSchema, programRegistrationSchema } from "../src/lib/validators"
 
 async function main() {
 const bytes = await buildCertificatePdf({
@@ -24,6 +25,7 @@ const bytes = await buildCertificatePdf({
     venue: "Dewan Seminar, Putrajaya",
     eventDate: "2026-10-18",
     eventEndDate: null,
+    eventTime: "09:00",
     signatoryName: "Dr. Amirah Zakaria",
     signatoryRole: "Pengarah Program",
     isOpen: true,
@@ -57,6 +59,17 @@ const invalid = attendanceSchema.safeParse({
   phone: "abc",
 })
 assert.equal(invalid.success, false)
+
+const registered = programRegistrationSchema.safeParse({
+  title: "Bengkel Contoh",
+  eventDate: "2026-10-18",
+  eventTime: "09:30:00",
+})
+assert.equal(registered.success, true)
+if (registered.success) assert.equal(registered.data.eventTime, "09:30")
+assert.equal(formatTime("09:00"), "9:00 pagi")
+assert.equal(formatTime("14:30"), "2:30 petang")
+assert.equal(formatTime("20:05"), "8:05 malam")
 
 console.log(`PDF A4 ok (${bytes.length} bytes)`)
 }

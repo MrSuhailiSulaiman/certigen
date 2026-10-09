@@ -14,6 +14,22 @@ export function formatDateRange(start: string, end: string | null) {
   return `${formatDate(start)} hingga ${formatDate(end)}`
 }
 
+export function formatTime(value: string) {
+  const match = /^(\d{2}):(\d{2})$/.exec(value)
+  if (!match) return ""
+  const hour = Number(match[1])
+  const minute = match[2]
+  const period = hour < 12 ? "pagi" : hour < 19 ? "petang" : "malam"
+  const display = hour % 12 || 12
+  return `${display}:${minute} ${period}`
+}
+
+export function formatSchedule(start: string, end: string | null, time = "") {
+  const date = formatDateRange(start, end)
+  const clock = formatTime(time)
+  return clock ? `${date}, ${clock}` : date
+}
+
 export function formatDateTime(iso: string) {
   return new Intl.DateTimeFormat("ms-MY", {
     dateStyle: "medium",

@@ -21,6 +21,7 @@ type ProgramRow = {
   venue: string
   event_date: string
   event_end_date: string | null
+  event_time: string | null
   signatory_name: string
   signatory_role: string
   is_open: boolean
@@ -47,7 +48,13 @@ function fail(error: PostgrestError): never {
     message.includes("schema cache")
   ) {
     throw new StoreError(
-      "Jadual Supabase belum wujud. Jalankan fail migrasi SQL dalam SQL Editor.",
+      "Jadual Supabase belum wujud. Jalankan supabase/migrations/20261008120000_init.sql dalam SQL Editor.",
+      { cause: error },
+    )
+  }
+  if (error.code === "PGRST204" || message.includes("event_time")) {
+    throw new StoreError(
+      "Lajur masa belum wujud. Jalankan supabase/migrations/20261009120000_program_time.sql dalam SQL Editor.",
       { cause: error },
     )
   }
@@ -74,6 +81,7 @@ function toProgram(row: ProgramRow): Program {
     venue: row.venue,
     eventDate: row.event_date,
     eventEndDate: row.event_end_date,
+    eventTime: row.event_time ?? "",
     signatoryName: row.signatory_name,
     signatoryRole: row.signatory_role,
     isOpen: row.is_open,
@@ -104,6 +112,7 @@ function programPayload(input: ProgramInput, extra?: { id?: string; slug?: strin
     venue: input.venue,
     event_date: input.eventDate,
     event_end_date: input.eventEndDate,
+    event_time: input.eventTime,
     signatory_name: input.signatoryName,
     signatory_role: input.signatoryRole,
     is_open: input.isOpen,

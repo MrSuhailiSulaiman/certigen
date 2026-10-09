@@ -4,7 +4,7 @@ import path from "node:path"
 import fontkit from "@pdf-lib/fontkit"
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib"
 
-import { formatDateRange } from "@/lib/format"
+import { formatSchedule } from "@/lib/format"
 import type { AttendanceWithProgram } from "@/lib/types"
 
 const A4: [number, number] = [595.28, 841.89]
@@ -197,24 +197,32 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
   y -= 14
   y = drawCentered(
     page,
-    formatDateRange(record.program.eventDate, record.program.eventEndDate),
+    formatSchedule(
+      record.program.eventDate,
+      record.program.eventEndDate,
+      record.program.eventTime,
+    ),
     y,
     regular,
     12,
     ink,
     contentWidth,
   )
-  y = drawCentered(page, record.program.venue, y, regular, 12, ink, contentWidth)
-  y -= 4
-  y = drawCentered(
-    page,
-    `Anjuran ${record.program.organizer}`,
-    y,
-    regular,
-    12,
-    ink,
-    contentWidth,
-  )
+  if (record.program.venue) {
+    y = drawCentered(page, record.program.venue, y, regular, 12, ink, contentWidth)
+  }
+  if (record.program.organizer) {
+    y -= 4
+    y = drawCentered(
+      page,
+      `Anjuran ${record.program.organizer}`,
+      y,
+      regular,
+      12,
+      ink,
+      contentWidth,
+    )
+  }
 
   page.drawEllipse({
     x: 118,
@@ -264,13 +272,15 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
     thickness: 0.7,
     color: ink,
   })
-  page.drawText(record.program.signatoryName, {
-    x: signX,
-    y: 92,
-    size: 11,
-    font: bold,
-    color: ink,
-  })
+  if (record.program.signatoryName) {
+    page.drawText(record.program.signatoryName, {
+      x: signX,
+      y: 92,
+      size: 11,
+      font: bold,
+      color: ink,
+    })
+  }
   if (record.program.signatoryRole) {
     page.drawText(record.program.signatoryRole, {
       x: signX,

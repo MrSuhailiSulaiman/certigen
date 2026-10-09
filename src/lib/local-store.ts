@@ -30,6 +30,7 @@ const seedPrograms: Program[] = [
     venue: "Dewan Seminar, Putrajaya",
     eventDate: "2026-10-18",
     eventEndDate: null,
+    eventTime: "09:00",
     signatoryName: "Dr. Amirah Zakaria",
     signatoryRole: "Pengarah Program",
     isOpen: true,
@@ -45,6 +46,7 @@ const seedPrograms: Program[] = [
     venue: "Pusat Konvensyen Shah Alam",
     eventDate: "2026-11-02",
     eventEndDate: "2026-11-03",
+    eventTime: "14:30",
     signatoryName: "Encik Hafiz Rahman",
     signatoryRole: "Pengerusi Penganjur",
     isOpen: true,
@@ -90,6 +92,18 @@ async function writeDatabase(data: Database) {
   await rename(temporary, filePath)
 }
 
+function normalizeProgram(program: Program): Program {
+  return {
+    ...program,
+    eventTime: program.eventTime ?? "",
+    description: program.description ?? "",
+    organizer: program.organizer ?? "",
+    venue: program.venue ?? "",
+    signatoryName: program.signatoryName ?? "",
+    signatoryRole: program.signatoryRole ?? "",
+  }
+}
+
 function withCounts(data: Database, programs: Program[], withCounts: boolean) {
   if (!withCounts) return programs
   return programs.map((program) => ({
@@ -106,21 +120,23 @@ export const localStore: AttendanceStore = {
   async listPrograms(options) {
     return withLock(async () => {
       const data = await readDatabase()
-      const programs = [...data.programs].sort((a, b) =>
-        a.eventDate < b.eventDate ? 1 : -1,
-      )
+      const programs = data.programs
+        .map(normalizeProgram)
+        .sort((a, b) => (a.eventDate < b.eventDate ? 1 : -1))
       return withCounts(data, programs, Boolean(options?.withCounts))
     })
   },
 
   async getProgramBySlug(slug) {
     const data = await readDatabase()
-    return data.programs.find((program) => program.slug === slug) ?? null
+    const program = data.programs.find((item) => item.slug === slug)
+    return program ? normalizeProgram(program) : null
   },
 
   async getProgramById(id) {
     const data = await readDatabase()
-    return data.programs.find((program) => program.id === id) ?? null
+    const program = data.programs.find((item) => item.id === id)
+    return program ? normalizeProgram(program) : null
   },
 
   async createProgram(input: ProgramInput) {
@@ -200,7 +216,7 @@ export const localStore: AttendanceStore = {
     if (!attendance) return null
     const program = data.programs.find((item) => item.id === attendance.programId)
     if (!program) return null
-    return { ...attendance, program }
+    return { ...attendance, program: normalizeProgram(program) }
   },
 
   async findAttendanceByEmail(programId, email) {

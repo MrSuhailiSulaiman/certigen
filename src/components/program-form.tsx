@@ -100,6 +100,15 @@ export function ProgramForm({
             className="h-11"
           />
         </Field>
+        <Field id="eventTime" label="Masa" error={errors.eventTime}>
+          <Input
+            id="eventTime"
+            name="eventTime"
+            type="time"
+            defaultValue={program?.eventTime ?? ""}
+            className="h-11"
+          />
+        </Field>
         <Field id="signatoryName" label="Nama penandatangan" error={errors.signatoryName}>
           <Input
             id="signatoryName"

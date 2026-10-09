@@ -6,7 +6,13 @@ import { redirect } from "next/navigation"
 import { isOrganizer, startOrganizerSession, endOrganizerSession } from "@/lib/auth"
 import { getStore, StoreError } from "@/lib/store"
 import type { FormState } from "@/lib/types"
-import { fieldErrors, pinSchema, readAttendance, readProgram } from "@/lib/validators"
+import {
+  fieldErrors,
+  pinSchema,
+  readAttendance,
+  readProgram,
+  readProgramRegistration,
+} from "@/lib/validators"
 
 function failure(error: unknown): FormState {
   if (error instanceof StoreError) return { error: error.message }
@@ -80,6 +86,43 @@ export async function loginOrganizer(
 export async function logoutOrganizer() {
   await endOrganizerSession()
   redirect("/urus")
+}
+
+export async function registerProgram(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const parsed = readProgramRegistration(formData)
+  if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) }
+
+  try {
+    const program = await getStore().createProgram({
+      title: parsed.data.title,
+      description: "",
+      organizer: "",
+      venue: "",
+      eventDate: parsed.data.eventDate,
+      eventEndDate: null,
+      eventTime: parsed.data.eventTime,
+      signatoryName: "",
+      signatoryRole: "",
+      isOpen: true,
+    })
+    revalidatePath("/")
+    revalidatePath("/daftar")
+    revalidatePath("/urus")
+    return {
+      saved: {
+        id: program.id,
+        slug: program.slug,
+        title: program.title,
+        eventDate: program.eventDate,
+        eventTime: program.eventTime,
+      },
+    }
+  } catch (error) {
+    return failure(error)
+  }
 }
 
 export async function createProgram(

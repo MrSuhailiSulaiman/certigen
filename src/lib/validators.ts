@@ -7,6 +7,23 @@ const dateField = z
   .trim()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Tarikh tidak sah.")
 
+const timeField = z
+  .string()
+  .trim()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/, "Masa tidak sah.")
+  .transform((value) => value.slice(0, 5))
+
+const optionalTimeField = z
+  .string()
+  .trim()
+  .transform((value) =>
+    /^\d{2}:\d{2}:\d{2}$/.test(value) ? value.slice(0, 5) : value,
+  )
+  .refine(
+    (value) => value === "" || /^([01]\d|2[0-3]):[0-5]\d$/.test(value),
+    "Masa tidak sah.",
+  )
+
 export const attendanceSchema = z.object({
   programId: z.string().trim().uuid("Program tidak sah."),
   fullName: z
@@ -52,6 +69,7 @@ export const programSchema = z
       .max(160, "Tempat terlalu panjang."),
     eventDate: dateField,
     eventEndDate: z.string().trim(),
+    eventTime: optionalTimeField,
     signatoryName: z
       .string()
       .trim()
@@ -83,6 +101,16 @@ export const programSchema = z
       eventEndDate: value.eventEndDate || null,
     }),
   )
+
+export const programRegistrationSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(3, "Nama program diperlukan.")
+    .max(160, "Nama program terlalu panjang."),
+  eventDate: dateField,
+  eventTime: timeField,
+})
 
 export const pinSchema = z.object({
   pin: z.string().trim().min(4, "PIN terlalu pendek.").max(80),
@@ -117,9 +145,18 @@ export function readProgram(formData: FormData) {
     venue: formData.get("venue"),
     eventDate: formData.get("eventDate"),
     eventEndDate: formData.get("eventEndDate") ?? "",
+    eventTime: formData.get("eventTime") ?? "",
     signatoryName: formData.get("signatoryName"),
     signatoryRole: formData.get("signatoryRole") ?? "",
     isOpen: formData.get("isOpen") === "on",
+  })
+}
+
+export function readProgramRegistration(formData: FormData) {
+  return programRegistrationSchema.safeParse({
+    title: formData.get("title") ?? "",
+    eventDate: formData.get("eventDate") ?? "",
+    eventTime: formData.get("eventTime") ?? "",
   })
 }
 

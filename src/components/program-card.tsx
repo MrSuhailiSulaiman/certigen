@@ -9,7 +9,7 @@ import {
   CardHeader,
 } from "@/components/ui/card"
 import { buttonVariants } from "@/components/ui/button"
-import { formatDateRange } from "@/lib/format"
+import { formatSchedule } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Program } from "@/lib/types"
 
@@ -36,21 +36,25 @@ export function ProgramCard({
           </Badge>
         </div>
         <CardDescription>
-          {formatDateRange(program.eventDate, program.eventEndDate)}
+          {formatSchedule(program.eventDate, program.eventEndDate, program.eventTime)}
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-2 text-sm">
         {program.description ? (
           <p className="text-foreground/80">{program.description}</p>
         ) : null}
-        <p>
-          <span className="text-muted-foreground">Tempat </span>
-          {program.venue}
-        </p>
-        <p>
-          <span className="text-muted-foreground">Anjuran </span>
-          {program.organizer}
-        </p>
+        {program.venue ? (
+          <p>
+            <span className="text-muted-foreground">Tempat </span>
+            {program.venue}
+          </p>
+        ) : null}
+        {program.organizer ? (
+          <p>
+            <span className="text-muted-foreground">Anjuran </span>
+            {program.organizer}
+          </p>
+        ) : null}
         {typeof program.attendanceCount === "number" ? (
           <p>
             <span className="text-muted-foreground">Kehadiran </span>

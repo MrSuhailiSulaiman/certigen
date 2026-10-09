@@ -13,7 +13,7 @@ import {
   CardHeader,
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { formatDateRange } from "@/lib/format"
+import { formatSchedule, formatTime } from "@/lib/format"
 import { getStore } from "@/lib/store"
 
 export const metadata = {
@@ -57,17 +57,27 @@ async function ProgramBody({ params }: { params: Promise<{ slug: string }> }) {
         ) : null}
         <dl className="mt-6 grid gap-3 text-sm">
           <div>
-            <dt className="text-muted-foreground">Tarikh</dt>
-            <dd>{formatDateRange(program.eventDate, program.eventEndDate)}</dd>
+            <dt className="text-muted-foreground">Tarikh Program</dt>
+            <dd>{formatSchedule(program.eventDate, program.eventEndDate, "")}</dd>
           </div>
-          <div>
-            <dt className="text-muted-foreground">Tempat</dt>
-            <dd>{program.venue}</dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground">Penganjur</dt>
-            <dd>{program.organizer}</dd>
-          </div>
+          {program.eventTime ? (
+            <div>
+              <dt className="text-muted-foreground">Masa</dt>
+              <dd>{formatTime(program.eventTime)}</dd>
+            </div>
+          ) : null}
+          {program.venue ? (
+            <div>
+              <dt className="text-muted-foreground">Tempat</dt>
+              <dd>{program.venue}</dd>
+            </div>
+          ) : null}
+          {program.organizer ? (
+            <div>
+              <dt className="text-muted-foreground">Penganjur</dt>
+              <dd>{program.organizer}</dd>
+            </div>
+          ) : null}
         </dl>
       </section>
 

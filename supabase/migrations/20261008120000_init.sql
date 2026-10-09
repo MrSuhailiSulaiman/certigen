@@ -13,6 +13,7 @@ create table if not exists public.programs (
   venue text not null,
   event_date date not null,
   event_end_date date,
+  event_time text not null default '',
   signatory_name text not null,
   signatory_role text not null default '',
   is_open boolean not null default true,
