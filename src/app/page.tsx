@@ -15,57 +15,12 @@ import { getStore } from "@/lib/store"
 import type { Program } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
-const steps = [
-  {
-    title: "Cipta program",
-    body: "Guru atau admin isi nama program, lokasi, tarikh, dan masa, kemudian kongsi pautan.",
-  },
-  {
-    title: "Isi kehadiran",
-    body: "Peserta tulis nama penuh dan no. kad pengenalan pada borang program.",
-  },
-  {
-    title: "Muat turun sijil",
-    body: "Sijil penyertaan PDF A4 disimpan ke telefon atau komputer.",
-  },
-]
-
 export default function HomePage() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-      <section className="max-w-2xl">
-        <p className="flex items-center gap-2 text-sm font-semibold tracking-[0.14em] text-primary uppercase">
-          <span aria-hidden className="size-1.5 bg-brand" />
-          Borang kehadiran
-        </p>
-        <h1 className="mt-3 font-heading text-4xl leading-tight tracking-tight sm:text-5xl">
-          Nama yang hadir, sijil yang terus boleh dimuat turun.
-        </h1>
-        <p className="mt-4 text-lg leading-8 text-muted-foreground">
-          Peserta mengisi borang. Sistem merekod program dan kehadiran, kemudian
-          menjana sijil penyertaan dalam PDF bersaiz A4.
-        </p>
-      </section>
-
-      <ol className="mt-10 grid gap-4 sm:grid-cols-3">
-        {steps.map((step, index) => (
-          <li key={step.title}>
-            <Card>
-              <CardHeader>
-                <p className="text-sm font-semibold tracking-wide text-brand">0{index + 1}</p>
-                <h2 className="font-heading text-xl">{step.title}</h2>
-              </CardHeader>
-              <CardContent>
-                <p>{step.body}</p>
-              </CardContent>
-            </Card>
-          </li>
-        ))}
-      </ol>
-
-      <section className="mt-14">
+      <section>
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-heading text-2xl">Program</h2>
+          <h1 className="font-heading text-2xl">Program</h1>
           <Suspense fallback={null}>
             <RegisterLink />
           </Suspense>
