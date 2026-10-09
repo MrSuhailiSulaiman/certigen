@@ -11,6 +11,7 @@ create table if not exists public.programs (
   description text not null default '',
   organizer text not null,
   venue text not null,
+  location text not null default '',
   event_date date not null,
   event_end_date date,
   event_time text not null default '',

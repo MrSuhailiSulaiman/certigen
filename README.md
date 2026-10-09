@@ -41,7 +41,7 @@ vercel integration add supabase
 vercel env pull .env.local --yes
 ```
 
-4. Dalam Supabase SQL Editor, jalankan `supabase/migrations/20261008120000_init.sql`. Jika jadual sudah wujud, jalankan juga `supabase/migrations/20261009120000_program_time.sql` dan `supabase/migrations/20261009140000_attendance_identity.sql`. Skrip ini mencipta jadual `programs` dan `attendance`, menyimpan nama, tarikh, masa, serta no. kad pengenalan, kemudian membenarkan kunci anon membaca program dan menulis kehadiran.
+4. Dalam Supabase SQL Editor, jalankan `supabase/migrations/20261008120000_init.sql`. Jika jadual sudah wujud, jalankan juga `supabase/migrations/20261009120000_program_time.sql`, `supabase/migrations/20261009140000_attendance_identity.sql`, dan `supabase/migrations/20261009160000_program_location.sql`. Skrip ini mencipta jadual `programs` dan `attendance`, menyimpan nama, lokasi, tarikh, masa, serta no. kad pengenalan, kemudian membenarkan kunci anon membaca program dan menulis kehadiran.
 5. Pastikan pembolehubah berikut wujud pada Vercel untuk Production, Preview, dan Development:
 
 | Nama | Kegunaan |

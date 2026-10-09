@@ -19,6 +19,7 @@ type ProgramRow = {
   description: string
   organizer: string
   venue: string
+  location?: string | null
   event_date: string
   event_end_date: string | null
   event_time: string | null
@@ -59,6 +60,12 @@ function fail(error: PostgrestError): never {
       { cause: error },
     )
   }
+  if (error.code === "42703" || message.includes("programs.location")) {
+    throw new StoreError(
+      "Lajur location belum wujud. Jalankan supabase/migrations/20261009160000_program_location.sql dalam SQL Editor.",
+      { cause: error },
+    )
+  }
   throw new StoreError("Tidak dapat berhubung dengan Supabase. Cuba sebentar lagi.", {
     cause: error,
   })
@@ -79,7 +86,7 @@ function toProgram(row: ProgramRow): Program {
     title: row.title,
     description: row.description,
     organizer: row.organizer,
-    venue: row.venue,
+    venue: (row.location ?? "").trim() || row.venue,
     eventDate: row.event_date,
     eventEndDate: row.event_end_date,
     eventTime: row.event_time ?? "",
@@ -115,6 +122,24 @@ function toAttendance(row: AttendanceRow): Attendance {
 }
 
 let identityColumn: boolean | null = null
+let locationColumn: boolean | null = null
+
+async function hasLocationColumn(supabase: SupabaseClient) {
+  if (locationColumn === true) return true
+  const { error } = await supabase.from("programs").select("location").limit(1)
+  if (!error) {
+    locationColumn = true
+    return true
+  }
+  if (
+    error.code === "42703" ||
+    error.code === "PGRST204" ||
+    error.message.includes("location")
+  ) {
+    return false
+  }
+  fail(error)
+}
 
 async function hasIdentityColumn(supabase: SupabaseClient) {
   if (identityColumn !== null) return identityColumn
@@ -130,13 +155,18 @@ async function hasIdentityColumn(supabase: SupabaseClient) {
   fail(error)
 }
 
-function programPayload(input: ProgramInput, extra?: { id?: string; slug?: string }) {
+function programPayload(
+  input: ProgramInput,
+  extra?: { id?: string; slug?: string },
+  includeLocation = false,
+) {
   return {
     ...extra,
     title: input.title,
     description: input.description,
     organizer: input.organizer,
     venue: input.venue,
+    ...(includeLocation ? { location: input.venue } : {}),
     event_date: input.eventDate,
     event_end_date: input.eventEndDate,
     event_time: input.eventTime,
@@ -191,10 +221,14 @@ export const supabaseStore: AttendanceStore = {
 
   async createProgram(input) {
     const supabase = client()
-    const row = programPayload(input, {
-      id: crypto.randomUUID(),
-      slug: slugify(input.title),
-    })
+    const row = programPayload(
+      input,
+      {
+        id: crypto.randomUUID(),
+        slug: slugify(input.title),
+      },
+      await hasLocationColumn(supabase),
+    )
     const { data, error } = await supabase
       .from("programs")
       .insert(row)
@@ -208,7 +242,7 @@ export const supabaseStore: AttendanceStore = {
     const supabase = client()
     const { data, error } = await supabase
       .from("programs")
-      .update(programPayload(input))
+      .update(programPayload(input, undefined, await hasLocationColumn(supabase)))
       .eq("id", id)
       .select("*")
       .maybeSingle()
