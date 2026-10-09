@@ -9,11 +9,11 @@ import type { AttendanceWithProgram } from "@/lib/types"
 
 const A4: [number, number] = [595.28, 841.89]
 
-const paper = rgb(0.973, 0.949, 0.906)
-const ink = rgb(0.145, 0.165, 0.15)
-const green = rgb(0.133, 0.275, 0.216)
-const gold = rgb(0.66, 0.52, 0.27)
-const muted = rgb(0.38, 0.34, 0.29)
+const paper = rgb(1, 1, 1)
+const ink = rgb(0.118, 0.176, 0.322)
+const blue = rgb(0.11, 0.31, 0.62)
+const red = rgb(0.722, 0.118, 0.18)
+const muted = rgb(0.357, 0.396, 0.471)
 
 async function loadFontBytes() {
   const directory = path.join(process.cwd(), "src/lib/fonts")
@@ -108,12 +108,14 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
   }
 
   page.drawRectangle({ x: 0, y: 0, width, height, color: paper })
+  page.drawRectangle({ x: 0, y: height - 12, width, height: 12, color: blue })
+  page.drawRectangle({ x: 0, y: height - 16, width, height: 4, color: red })
   page.drawRectangle({
     x: 22,
     y: 22,
     width: width - 44,
     height: height - 44,
-    borderColor: green,
+    borderColor: blue,
     borderWidth: 1.6,
   })
   page.drawRectangle({
@@ -121,7 +123,7 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
     y: 30,
     width: width - 60,
     height: height - 60,
-    borderColor: gold,
+    borderColor: red,
     borderWidth: 0.7,
   })
 
@@ -138,22 +140,22 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
       start: { x, y },
       end: { x: x + dx, y },
       thickness: 1.2,
-      color: green,
+      color: blue,
     })
     page.drawLine({
       start: { x, y },
       end: { x, y: y + dy },
       thickness: 1.2,
-      color: green,
+      color: blue,
     })
   }
 
   const contentWidth = width - 140
   let y = height - 108
 
-  drawTracked(page, "E-SIJIL KEHADIRAN", y, regular, 10, gold, 2.2)
+  drawTracked(page, "E-SIJIL KEHADIRAN", y, regular, 10, red, 2.2)
   y -= 36
-  y = drawCentered(page, "Sijil Penyertaan", y, bold, 30, green, contentWidth, 4)
+  y = drawCentered(page, "Sijil Penyertaan", y, bold, 30, blue, contentWidth, 4)
   y -= 8
 
   const ruleWidth = 92
@@ -161,7 +163,7 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
     start: { x: (width - ruleWidth) / 2, y },
     end: { x: (width + ruleWidth) / 2, y },
     thickness: 0.8,
-    color: gold,
+    color: red,
   })
   y -= 36
   y = drawCentered(
@@ -180,7 +182,7 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
     start: { x: width / 2 - 70, y: y + 4 },
     end: { x: width / 2 + 70, y: y + 4 },
     thickness: 0.6,
-    color: gold,
+    color: red,
   })
   y -= 28
   y = drawCentered(
@@ -193,7 +195,7 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
     contentWidth,
   )
   y -= 8
-  y = drawCentered(page, record.program.title, y, bold, 16, green, contentWidth, 4)
+  y = drawCentered(page, record.program.title, y, bold, 16, blue, contentWidth, 4)
   y -= 14
   y = drawCentered(
     page,
@@ -229,7 +231,7 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
     y: 132,
     xScale: 28,
     yScale: 28,
-    borderColor: gold,
+    borderColor: red,
     borderWidth: 1.1,
   })
   page.drawEllipse({
@@ -237,7 +239,7 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
     y: 132,
     xScale: 23,
     yScale: 23,
-    borderColor: green,
+    borderColor: blue,
     borderWidth: 0.6,
   })
   const seal = "HADIR"
@@ -247,7 +249,7 @@ export async function buildCertificatePdf(record: AttendanceWithProgram) {
     y: 128,
     size: 8,
     font: bold,
-    color: green,
+    color: blue,
   })
 
   page.drawText("No. sijil", {

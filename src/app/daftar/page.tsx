@@ -30,7 +30,8 @@ export default function RegisterProgramPage() {
   return (
     <div className="mx-auto grid w-full max-w-3xl gap-8 px-4 py-10 sm:px-6">
       <section>
-        <p className="text-sm font-medium tracking-wide text-primary uppercase">
+        <p className="flex items-center gap-2 text-sm font-semibold tracking-[0.14em] text-primary uppercase">
+          <span aria-hidden className="size-1.5 bg-brand" />
           Borang daftar
         </p>
         <h1 className="mt-3 font-heading text-4xl leading-tight">Daftar program</h1>

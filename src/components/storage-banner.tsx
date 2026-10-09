@@ -12,7 +12,7 @@ export async function StorageBanner() {
   const { configured, url } = supabaseConfig()
   if (!configured) {
     return (
-      <p className="bg-secondary px-4 py-2 text-center text-sm text-secondary-foreground">
+      <p className="bg-brand px-4 py-2 text-center text-sm text-brand-foreground">
         Supabase belum disambung. Rekod disimpan pada pelayan pembangunan ini sahaja
         dan tidak kekal selepas deploy Vercel. Tambah URL serta kunci service role,
         kemudian jalankan migrasi SQL.
@@ -26,7 +26,7 @@ export async function StorageBanner() {
     const message =
       error instanceof Error ? error.message : "Tidak dapat berhubung dengan Supabase."
     return (
-      <p className="bg-secondary px-4 py-2 text-center text-sm text-secondary-foreground">
+      <p className="bg-brand px-4 py-2 text-center text-sm text-brand-foreground">
         Supabase {projectRef(url)} tidak dapat dibaca. {message}
       </p>
     )

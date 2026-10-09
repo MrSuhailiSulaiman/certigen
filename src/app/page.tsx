@@ -33,7 +33,8 @@ export default function HomePage() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <section className="max-w-2xl">
-        <p className="text-sm font-medium tracking-wide text-primary uppercase">
+        <p className="flex items-center gap-2 text-sm font-semibold tracking-[0.14em] text-primary uppercase">
+          <span aria-hidden className="size-1.5 bg-brand" />
           Borang kehadiran
         </p>
         <h1 className="mt-3 font-heading text-4xl leading-tight tracking-tight sm:text-5xl">
@@ -50,7 +51,7 @@ export default function HomePage() {
           <li key={step.title}>
             <Card>
               <CardHeader>
-                <p className="text-sm text-muted-foreground">0{index + 1}</p>
+                <p className="text-sm font-semibold tracking-wide text-brand">0{index + 1}</p>
                 <h2 className="font-heading text-xl">{step.title}</h2>
               </CardHeader>
               <CardContent>

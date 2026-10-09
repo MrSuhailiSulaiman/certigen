@@ -5,11 +5,14 @@ import { cn } from "@/lib/utils"
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-border/80 bg-card/80 backdrop-blur">
+    <header className="border-b border-border bg-card">
+      <div className="h-1 bg-primary" />
+      <div className="h-0.5 bg-brand" />
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="grid size-9 place-items-center rounded-md bg-primary font-heading text-lg text-primary-foreground">
+          <span className="relative grid size-9 place-items-center rounded-md bg-primary text-lg font-semibold text-primary-foreground">
             S
+            <span className="absolute -right-1 -bottom-1 size-2.5 rounded-[2px] bg-brand ring-2 ring-card" />
           </span>
           <span className="leading-tight">
             <span className="block font-heading text-lg tracking-tight">SijilHadir</span>

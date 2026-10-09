@@ -44,7 +44,8 @@ async function CertificateBody({
     <div className="mx-auto grid w-full max-w-5xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_280px]">
       <CertificateSheet record={record} />
       <aside className="lg:pt-6">
-        <p className="text-sm font-medium tracking-wide text-primary uppercase">
+        <p className="flex items-center gap-2 text-sm font-semibold tracking-[0.14em] text-primary uppercase">
+          <span aria-hidden className="size-1.5 bg-brand" />
           {query.sudah === "1" ? "Kehadiran sudah direkod" : "Kehadiran direkod"}
         </p>
         <h1 className="mt-2 font-heading text-3xl leading-tight">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Fraunces, Geist, Geist_Mono } from "next/font/google"
+import { Geist, Geist_Mono } from "next/font/google"
 import { Suspense } from "react"
 
 import { SiteFooter } from "@/components/site-footer"
@@ -18,11 +18,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 })
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-})
-
 export const metadata: Metadata = {
   title: {
     default: "SijilHadir",
@@ -36,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ms"
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <SiteHeader />
