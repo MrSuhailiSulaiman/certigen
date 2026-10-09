@@ -36,12 +36,10 @@ export default function HomePage() {
 async function RegisterLink() {
   await connection()
   const session = await getSession()
+  if (!session) return null
   return (
-    <Link
-      href={session ? "/daftar" : "/login?next=/daftar"}
-      className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}
-    >
-      {session ? "Daftar program" : "Masuk untuk daftar"}
+    <Link href="/daftar" className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}>
+      Daftar program
     </Link>
   )
 }
@@ -90,14 +88,13 @@ async function ProgramList() {
             nampak program di sini sebaik sahaja ia disimpan.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Link
-            href={session ? "/daftar" : "/login?next=/daftar"}
-            className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}
-          >
-            {session ? "Daftar program" : "Masuk untuk daftar"}
-          </Link>
-        </CardContent>
+        {session ? (
+          <CardContent>
+            <Link href="/daftar" className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}>
+              Daftar program
+            </Link>
+          </CardContent>
+        ) : null}
       </Card>
     )
   }
