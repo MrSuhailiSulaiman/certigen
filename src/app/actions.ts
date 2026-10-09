@@ -3,15 +3,14 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import { endSession, getSession, safeNext, startSession } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { normalizeIdentity } from "@/lib/format"
 import { getStore, StoreError } from "@/lib/store"
 import type { FormState } from "@/lib/types"
-import { ensureAdmin, authenticate, registerGuru, type Account } from "@/lib/users"
+import { registerGuru } from "@/lib/users"
 import {
   fieldErrors,
   guruSchema,
-  loginSchema,
   readAttendance,
   readProgram,
   readProgramRegistration,
@@ -71,33 +70,6 @@ export async function lookupAttendance(
     return failure(error)
   }
   redirect(`/sijil/${attendanceId}`)
-}
-
-export async function login(
-  _prev: FormState,
-  formData: FormData,
-): Promise<FormState> {
-  const parsed = loginSchema.safeParse({
-    username: formData.get("username"),
-    password: formData.get("password"),
-  })
-  if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) }
-
-  let account: Account | null = null
-  try {
-    await ensureAdmin()
-    account = await authenticate(parsed.data.username, parsed.data.password)
-  } catch (error) {
-    return failure(error)
-  }
-  if (!account) return { error: "Nama pengguna atau kata laluan tidak sepadan." }
-  await startSession(account)
-  redirect(safeNext(formData.get("next")) ?? "/urus")
-}
-
-export async function logout() {
-  await endSession()
-  redirect("/login")
 }
 
 async function requireStaff() {

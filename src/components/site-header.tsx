@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { connection } from "next/server"
 
-import { logout } from "@/app/actions"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { getSession } from "@/lib/auth"
 import { cn } from "@/lib/utils"
@@ -49,6 +48,7 @@ export async function SiteHeader() {
           {session ? (
             <Link
               href="/daftar"
+              prefetch={false}
               className={cn(buttonVariants({ size: "lg" }), "h-10 px-3")}
             >
               Daftar
@@ -57,6 +57,7 @@ export async function SiteHeader() {
           {session ? (
             <Link
               href="/urus"
+              prefetch={false}
               className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10 px-3")}
             >
               Urus
@@ -65,13 +66,14 @@ export async function SiteHeader() {
           {session?.role === "admin" ? (
             <Link
               href="/urus/guru"
+              prefetch={false}
               className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-10 px-3")}
             >
               Guru
             </Link>
           ) : null}
           {session ? (
-            <form action={logout}>
+            <form action="/api/logout" method="post">
               <Button type="submit" variant="ghost" className="h-10 px-3">
                 Keluar
               </Button>

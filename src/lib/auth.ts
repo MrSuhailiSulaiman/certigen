@@ -1,11 +1,11 @@
 import { createHmac, timingSafeEqual } from "node:crypto"
 
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
 
 import type { Role } from "@/lib/users"
 
-const COOKIE = "sijil_session"
-const MAX_AGE_MS = 60 * 60 * 12 * 1000
+export const SESSION_COOKIE = "sijil_session"
+const MAX_AGE_SECONDS = 60 * 60 * 12
 
 export type SessionUser = {
   id: string
@@ -41,9 +41,39 @@ export function safeNext(value: unknown) {
   return value
 }
 
-export async function getSession(): Promise<SessionUser | null> {
-  const jar = await cookies()
-  const raw = jar.get(COOKIE)?.value
+export function sessionCookieOptions() {
+  return {
+    name: SESSION_COOKIE,
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: MAX_AGE_SECONDS,
+  }
+}
+
+export function createSessionValue(user: SessionUser) {
+  const body = Buffer.from(
+    JSON.stringify({
+      ...user,
+      exp: Date.now() + MAX_AGE_SECONDS * 1000,
+    }),
+    "utf8",
+  ).toString("base64url")
+  return `${body}.${sign(body)}`
+}
+
+function readCookie(header: string, name: string) {
+  for (const part of header.split(";")) {
+    const separator = part.indexOf("=")
+    if (separator === -1) continue
+    if (part.slice(0, separator).trim() !== name) continue
+    return decodeURIComponent(part.slice(separator + 1).trim())
+  }
+  return ""
+}
+
+function parseSession(raw: string): SessionUser | null {
   if (!raw) return null
   const separator = raw.lastIndexOf(".")
   if (separator <= 0) return null
@@ -69,22 +99,16 @@ export async function getSession(): Promise<SessionUser | null> {
   }
 }
 
-export async function startSession(user: SessionUser) {
-  const body = Buffer.from(
-    JSON.stringify({ ...user, exp: Date.now() + MAX_AGE_MS }),
-    "utf8",
-  ).toString("base64url")
-  const jar = await cookies()
-  jar.set(COOKIE, `${body}.${sign(body)}`, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: MAX_AGE_MS / 1000,
-  })
+async function sessionCookieValue() {
+  try {
+    const jar = await cookies()
+    return jar.get(SESSION_COOKIE)?.value ?? ""
+  } catch {
+    const headerStore = await headers()
+    return readCookie(headerStore.get("cookie") ?? "", SESSION_COOKIE)
+  }
 }
 
-export async function endSession() {
-  const jar = await cookies()
-  jar.delete(COOKIE)
+export async function getSession(): Promise<SessionUser | null> {
+  return parseSession(await sessionCookieValue())
 }

@@ -1,33 +1,51 @@
 "use client"
 
-import { useActionState } from "react"
-import { useFormStatus } from "react-dom"
+import { useState } from "react"
 
-import { login } from "@/app/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { FormState } from "@/lib/types"
 
-function SubmitButton() {
-  const { pending } = useFormStatus()
+export function LoginForm({ next, initialError = "" }: { next: string; initialError?: string }) {
+  const [error, setError] = useState(initialError)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [pending, setPending] = useState(false)
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setPending(true)
+    setError("")
+    setFieldErrors({})
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(event.currentTarget),
+      })
+      const data = (await response.json()) as {
+        error?: string
+        fieldErrors?: Record<string, string>
+        next?: string
+      }
+      if (!response.ok) {
+        setError(data.error ?? "Log masuk gagal.")
+        setFieldErrors(data.fieldErrors ?? {})
+        setPending(false)
+        return
+      }
+      window.location.assign(data.next || "/urus")
+    } catch {
+      setError("Log masuk tidak dapat disemak. Cuba sebentar lagi.")
+      setPending(false)
+    }
+  }
+
   return (
-    <Button type="submit" className="h-11 px-5" disabled={pending}>
-      {pending ? "Menyemak..." : "Masuk"}
-    </Button>
-  )
-}
-
-export function LoginForm({ next }: { next: string }) {
-  const [state, action] = useActionState<FormState, FormData>(login, null)
-  const errors = state?.fieldErrors ?? {}
-
-  return (
-    <form action={action} className="grid gap-4">
+    <form action="/api/login" method="post" onSubmit={onSubmit} className="grid gap-4">
       <input type="hidden" name="next" value={next} />
-      {state?.error ? (
+      {error ? (
         <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-          {state.error}
+          {error}
         </p>
       ) : null}
       <div className="grid gap-1.5">
@@ -38,9 +56,11 @@ export function LoginForm({ next }: { next: string }) {
           autoComplete="username"
           required
           className="h-11"
-          aria-invalid={Boolean(errors.username)}
+          aria-invalid={Boolean(fieldErrors.username)}
         />
-        {errors.username ? <p className="text-sm text-destructive">{errors.username}</p> : null}
+        {fieldErrors.username ? (
+          <p className="text-sm text-destructive">{fieldErrors.username}</p>
+        ) : null}
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="password">Kata laluan</Label>
@@ -51,11 +71,15 @@ export function LoginForm({ next }: { next: string }) {
           autoComplete="current-password"
           required
           className="h-11"
-          aria-invalid={Boolean(errors.password)}
+          aria-invalid={Boolean(fieldErrors.password)}
         />
-        {errors.password ? <p className="text-sm text-destructive">{errors.password}</p> : null}
+        {fieldErrors.password ? (
+          <p className="text-sm text-destructive">{fieldErrors.password}</p>
+        ) : null}
       </div>
-      <SubmitButton />
+      <Button type="submit" className="h-11 px-5" disabled={pending}>
+        {pending ? "Menyemak..." : "Masuk"}
+      </Button>
     </form>
   )
 }

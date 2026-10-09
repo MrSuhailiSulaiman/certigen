@@ -14,7 +14,7 @@ export const metadata = {
 export default function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>
+  searchParams: Promise<{ next?: string; ralat?: string }>
 }) {
   return (
     <Suspense fallback={<div className="mx-auto max-w-md px-4 py-12">Memuatkan log masuk...</div>}>
@@ -26,11 +26,12 @@ export default function LoginPage({
 async function LoginBody({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>
+  searchParams: Promise<{ next?: string; ralat?: string }>
 }) {
   await connection()
+  const query = await searchParams
   const session = await getSession()
-  const next = safeNext((await searchParams).next) ?? "/urus"
+  const next = safeNext(query.next) ?? "/urus"
   if (session) redirect(next)
 
   return (
@@ -52,7 +53,7 @@ async function LoginBody({
           <CardDescription>Gunakan akaun admin atau akaun guru yang didaftarkan.</CardDescription>
         </CardHeader>
         <CardContent>
-          <LoginForm next={next} />
+          <LoginForm next={next} initialError={(query.ralat ?? "").slice(0, 160)} />
         </CardContent>
       </Card>
     </div>

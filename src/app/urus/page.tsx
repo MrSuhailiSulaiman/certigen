@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { connection } from "next/server"
 import { Suspense } from "react"
 
-import { createProgram, logout } from "@/app/actions"
+import { createProgram } from "@/app/actions"
 import { ProgramCard } from "@/components/program-card"
 import { ProgramForm } from "@/components/program-form"
 import { ProgramShare } from "@/components/program-share"
@@ -59,7 +59,7 @@ async function OrganizerBody() {
               Daftar guru
             </Link>
           ) : null}
-          <form action={logout}>
+          <form action="/api/logout" method="post">
             <Button type="submit" variant="outline" className="h-10 px-4">
               Keluar
             </Button>
